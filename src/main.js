@@ -6,11 +6,12 @@ import './plugins/element.js'
 import './assets/css/global.css'
 
 import axios from 'axios'
-/* 配置请求的根路径 */
-axios.defaults.baseURL = ''//api接口文档中
-Vue.prototype.$http = axios
+import api from './api' // 导入api接口
+
 
 Vue.config.productionTip = false
+Vue.prototype.$axios = axios;
+Vue.prototype.$api = api; // 将api挂载到vue的原型上复制代码
 
 
 new Vue({
