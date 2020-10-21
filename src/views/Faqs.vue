@@ -1,6 +1,6 @@
 <template>
   <div>
-    <header-cpn></header-cpn>
+    <page-tab-bar></page-tab-bar>
 
     <faq-cpn></faq-cpn>    
 
@@ -8,13 +8,13 @@
 </template>
 
 <script>
-import HeaderCpn from '../components/headercpn'
+import PageTabBar from '../components/content/tabbar/PageTabBar'
 import FaqCpn from '../components/faqcpn'
 
 export default {
     name: 'faqs',
     components: {
-      HeaderCpn,
+      PageTabBar,
       FaqCpn
     },
 };

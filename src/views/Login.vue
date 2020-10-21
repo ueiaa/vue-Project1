@@ -1,6 +1,6 @@
 <template>
   <div>
-    <header-cpn></header-cpn>
+    <page-tab-bar></page-tab-bar>
 
     <login-cpn></login-cpn>    
 
@@ -8,12 +8,12 @@
 </template>
 
 <script>
-import HeaderCpn from '../components/headercpn'
+import PageTabBar from '../components/content/tabbar/PageTabBar'
 import LoginCpn from '../components/logincpn'
 export default {
     name: 'login',
     components: {
-      HeaderCpn,
+      PageTabBar,
       LoginCpn
     },
 };

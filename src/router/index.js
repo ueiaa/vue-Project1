@@ -4,8 +4,9 @@ import Login from '../views/Login.vue'
 import Home from '../views/Home.vue'
 import ChooseTime from '../components/ChooseTime.vue'
 import Faqs from '../views/Faqs.vue'
-import PasswordReminder from '../views/PasswordReminder.vue'
 
+const ResetPswVerify = () => import('../views/reset_psw/PhoneVerify')
+const SetPsw = () => import('../views/reset_psw/SetPsw')
 
 
 Vue.use(VueRouter)
@@ -33,7 +34,14 @@ const router = new VueRouter({
     { path: '/home', component: Home },
     { path: '/chooseTime', component: ChooseTime},
     { path: '/faqs', component: Faqs},
-    { path: '/passwordReminder', component: PasswordReminder}
+    {
+      path: '/resetpsw',
+      redirect: '/resetpsw/verify',
+    },
+    {
+      path: '/resetpsw/verify',
+      component: ResetPswVerify
+    },
   ]
 })
 

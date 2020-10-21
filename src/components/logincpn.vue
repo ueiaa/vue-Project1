@@ -63,7 +63,7 @@
       <!-- 忘记密码 -->
       <div class="pwd_forgot" style="cursor: pointer">
         <div class="text">
-          <p @click="itemClick('/passwordReminder')">忘记密码?</p>
+          <p @click="itemClick('/resetpsw')">忘记密码?</p>
         </div>
       </div>
     </div>
@@ -159,7 +159,7 @@ export default {
         phoneNumber: "",
         vCode: "",
       },
-      flag: 0,
+
       //表单验证规则对象
       loginWithPwdRules: {
         phoneOrEmail: [
@@ -209,6 +209,7 @@ export default {
         this.$api.verifycode.sendPhoneVerifyCode({
           phoneNumber:this.registerForm.phoneNumber
         }).then(res => {
+          //console.log(res.data)
           if(res.data.code == 200){
             this.registerForm.vCode = res.data.data
           }else{
@@ -238,11 +239,14 @@ export default {
     },
 
     //获取输入框的内容
-    getInput(){
-      if('/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/'.test(this.phoneOrEmail)){
-        return this.flag = 1;
+    getInput(str){
+      const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/;
+      const regPhone = /[0-9]{11}/;
+      str = this.loginWithPwdForm.phoneOrEmail
+     if(regEmail.test(str)){
+        return true;
       } else {
-        return this.flag = 0;
+        return false;
       }
     },    
 
@@ -250,7 +254,7 @@ export default {
     submitForm(loginWithPwdForm) {
       this.$refs[loginWithPwdForm].validate((valid) => {
         if (valid) {
-          if(this.flag == 1){
+          if(this.getInput(this.loginWithPwdForm.phoneOrEmail)){
             this.$api.login.loginByEmail( {
               
                 email: this.loginWithPwdForm.phoneOrEmail, // 登录名
@@ -258,7 +262,7 @@ export default {
               
             })
             .then(res => {
-              console.log(res.data)
+              //console.log(res.data)
               if (res.data.code == 200) {
                 this.$router.push('/home');
                 //alert('登陆成功');
@@ -277,7 +281,7 @@ export default {
               
             })
             .then(res => {
-              console.log(res.data)
+              //console.log(res.data)
               if (res.data.code == 200) {
                 this.$router.push('/home');
                 //alert('登录成功');
@@ -301,7 +305,7 @@ export default {
         if(valid){
           this.$api.verifycode.verifyPhoneAndCode({
             phoneNumber: this.registerForm.phoneNumber,
-            verifycode: this.registerForm.vCode
+            verifyCode: this.registerForm.vCode
           }).then(res => {
               console.log(res.data)
               if (res.data.code == 200) {
