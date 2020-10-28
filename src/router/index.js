@@ -1,13 +1,16 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '../views/Login.vue'
-import Home from '../views/Home.vue'
-import ChooseTime from '../components/ChooseTime.vue'
-import Faqs from '../views/Faqs.vue'
 
+const Home = () => import('../views/Home')
 const ResetPswVerify = () => import('../views/reset_psw/PhoneVerify')
 const SetPsw = () => import('../views/reset_psw/SetPsw')
-
+const SetSuccess = () => import('../views/reset_psw/SetSuccess')
+const Login = () => import('../views/Login')
+const Faqs = () => import('../views/Faqs')
+const Choose = () => import('../views/Choose')
+const Result = () => import('../views/Result')
+const CopyLink = () => import('../views/CopyLink')
+const FinalResult = () => import('../views/FinalResult')
 
 Vue.use(VueRouter)
 const originalPush = VueRouter.prototype.push
@@ -17,50 +20,63 @@ VueRouter.prototype.push = function push(location) {
   return originalPush.call(this, location).catch(err => err)
 }
 
-/* const routes = new Router
-  routes: [
-  { path: '/', redirect: '/login' },
-  { path: '/login', component: Login },
-  { path: '/home', component: Home },
-  { path: '/chooseTime', component: ChooseTime},
-  { path: '/faqs', component: Faqs},
-  { path: '/passwordReminder', component: PasswordReminder}
-] */
+const routes = [
+  {
+    path: '',
+    redirect: '/home'
+  },
+  {
+    path: '/home',
+    component: Home
+  },
+  {
+    path: '/resetpsw',
+    redirect: '/resetpsw/verify',
+  },
+  {
+    path: '/resetpsw/verify',
+    component: ResetPswVerify
+  },
+  {
+    path: '/resetpsw/password',
+    component: SetPsw
+  },
+  {
+    path: '/resetpsw/success',
+    component: SetSuccess
+  },
+  {
+    path: '/login',
+    component: Login
+  },
+  {
+    path: '/faqs',
+    component: Faqs
+  },
+  {
+    path: '/choose',
+    component: Choose
+  },
+  {
+    path: '/result',
+    component: Result
+  },
+  {
+    path: '/copylink',
+    component: CopyLink
+  },
+  {
+    path: '/finalresult',
+    component: FinalResult
+  }
+
+]
 
 const router = new VueRouter({
-  routes: [
-    { path: '/', redirect: '/login' },
-    { path: '/login', component: Login },
-    { path: '/home', component: Home },
-    { path: '/chooseTime', component: ChooseTime},
-    { path: '/faqs', component: Faqs},
-    {
-      path: '/resetpsw',
-      redirect: '/resetpsw/verify',
-    },
-    {
-      path: '/resetpsw/verify',
-      component: ResetPswVerify
-    },
-  ]
+  routes: routes,
+  mode: 'history',
+  base: process.env.BASE_URL,
+  routes
 })
-
-//挂载路由导航守卫
-/* router.beforeEach((to, from, next) => {
-  //to 将要访问的路径
-  //from 代表从哪个路径跳转而来
-  //next 是一个函数，表示放行
-  // 两种 1.next() 放行 2.next('/login) 强制跳转
-
-  if(to.path ==='/login'){
-    return next();//如果要访问登录页，直接放行
-  }
-  //获取token
-  const tokenStr = window.sessionStorage.getItem('token')
-  //没有token 强制跳转到登录页
-  if(!tokenStr) return next('/login')
-  next()
-}) */
-
 
 export default router

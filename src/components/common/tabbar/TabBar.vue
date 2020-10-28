@@ -17,15 +17,19 @@ export default {
     height: 70px;
     display: flex;
     align-items: center;
+
     border-bottom: 1px solid #409EFF;
     box-shadow: 1px 1px 3px rgb(167, 205, 255);
+
     position: fixed;
     top: 0;
     z-index: 100;
   }
+
   #web-icon {
     flex: 1;
   }
+
   #tab-bar-items {
     flex: 2;
     display: flex;

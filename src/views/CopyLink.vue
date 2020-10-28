@@ -1,22 +1,26 @@
 <template>
   <div>
     <page-tab-bar></page-tab-bar>
-    <event-choose></event-choose>
-  </div>  
+
+    <copy-link-cpn></copy-link-cpn>    
+
+  </div>
 </template>
+
 <script>
 import PageTabBar from '../components/content/tabbar/PageTabBar'
-import EventChoose from '../components/content/EventChoose'
+import CopyLinkCpn from '../components/content/CopyLinkCpn'
+
 export default {
-    name: 'choose',
+    name: 'copylink',
     components: {
       PageTabBar,
-      EventChoose
+      CopyLinkCpn
     },
-
 };
 </script>
 
-<style lang="">
-    
+<style lang="less">
+
+
 </style>

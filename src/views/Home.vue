@@ -25,7 +25,7 @@
           <div class="help-more">
             <span>
               更多内容请点击
-              <router-link to='/help'>帮助</router-link>
+              <router-link to='/faqs'>帮助</router-link>
             </span>
           </div>
         </div>
@@ -35,6 +35,7 @@
 
 <script>
 import HomeTabBar from '@/components/content/tabbar/HomeTabBar'
+
 export default {
   name: 'Home',
   components: {
@@ -55,60 +56,75 @@ export default {
     position: fixed;
     background-image: linear-gradient(to right, #92d5ff, white);
 }
+
 .home-wrapper {
   height: 100%;
   width: 1200px;
   margin: 0 auto;
+
   position: relative;
 }
+
 .intro-wrapper {
   position: absolute;
   top: 160px;
   left: 80px;
+
   color: white;
   font-size: 80px;
   font-weight: bold;
 }
+
 .intro-wrapper li {
   height: 110px;
 }
+
 .img-wrapper {
   width: 500px;
   position: absolute;
   top: 280px;
   left: 260px;
 }
+
 .img-wrapper img {
   max-width: 100%;
   height: auto;
 }
+
 .btn-wrapper{
     position: absolute;
     top: 180px;
     right: 130px;
 }
+
 .btn-wrapper .el-button{
     margin: 0 10px;
+
     font-size: 25px;
     color: white;
     background-color: rgb(2, 81, 180);
 }
+
 .help-wrapper {
   position: absolute;
   top: 280px;
   left: 800px;
   width: 350px;
+
   font-size: 20px;
 }
+
 .help-info li {
   line-height: 25px;
   margin: 20px 0;
 }
+
 .help-more {
   position: absolute;
   right: 0;
   margin: 50px 0;
 }
+
 .help-more a {
   text-decoration: none;
   color: #298FEC;

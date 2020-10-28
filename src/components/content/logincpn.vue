@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 框 -->
-    <div class="base"></div>
+    <div class="base">
 
     <!-- 账号密码登录 -->
     <div class="title1" style="cursor: pointer" @click="cur = 0" :class="{ active: cur == 0 }">
@@ -113,11 +113,11 @@
         </p>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
 <script>
-
 export default {
   name: "LoginCpn",
   data() {
@@ -136,7 +136,6 @@ export default {
       }
       callback(new Error("请输入正确的手机号码"));
     };
-
     var checkPhoneNumber = (rule, value, callback) => {
       const regPhone = /[0-9]{11}/;
       if (regPhone.test(value)) {
@@ -145,7 +144,6 @@ export default {
       }
       callback(new Error("请输入正确的手机号码"));
     };
-
     return {
       //当前展示表单
       cur: 0,
@@ -159,23 +157,19 @@ export default {
         phoneNumber: "",
         vCode: "",
       },
-
       //表单验证规则对象
       loginWithPwdRules: {
         phoneOrEmail: [
           { required: true, message: "请输入手机号或邮箱", trigger: "blur" },
           { validator: checkPhoneOrEmail, trigger: "blur" },
         ],
-
         password: [{ required: true, message: "请输入密码", trigger: "blur" }],
       },
-
       registerRules: {
         phoneNumber: [
           { required: true, message: "请输入手机号", trigger: "blur" },
           { validator: checkPhoneNumber, trigger: "blur" },
         ],
-
         vCode: [{ required: true, message: "请输入验证码", trigger: "blur" }],
       },
     };
@@ -185,22 +179,6 @@ export default {
     itemClick(path) {
       this.$router.push(path);
     },
-
-    /* getVCode() {
-      this.checkPhoneNumber();
-
-      //后台需传入的参数
-      let data = {
-        phoneNumber: this.registerForm.phoneNumber,
-        type: this.vCodeType,
-      };
-      this.$ajax.post("/sms/getVerificationCode", data, (res) => {
-        if (res.vCode == 0) {
-          this.registerForm.vCode = res.data.data;
-        }
-      });
-    }, */
-
     // 获取短信验证码
     getVCode() {
       var regPhone = /[0-9]{11}/;
@@ -221,7 +199,6 @@ export default {
       }
       
     },
-
     //短信验证码倒计时
     validateBtn() {
       let time = 60;
@@ -237,7 +214,6 @@ export default {
         }
       }, 1000);
     },
-
     //获取输入框的内容
     getInput(str){
       const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/;
@@ -249,7 +225,6 @@ export default {
         return false;
       }
     },    
-
     //账号密码登录
     submitForm(loginWithPwdForm) {
       this.$refs[loginWithPwdForm].validate((valid) => {
@@ -299,7 +274,6 @@ export default {
         }
       });
     },
-
     register(registerForm) {
       this.$refs[registerForm].validate((valid) => {
         if(valid){
@@ -330,22 +304,23 @@ export default {
 <style lang="less">
 .base {
   border-width: 0px;
-  position: absolute;
-  left: 517px;
-  top: 160px;
-  width: 886px;
-  height: 719px;
+  position: relative;
+  //left: 400px;
+  //top: 130px;
+  width: 750px;
+  height: 600px;
   display: flex;
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.35);
   border-radius: 10px;
+  margin: 180px auto
 }
-
 .title1 {
   border-width: 0px;
   position: absolute;
-  left: 573px;
-  top: 194px;
-  width: 390px;
+  //left: 450px;
+  //top: 150px;
+  margin: 20px 0px 0px 20px;
+  width: 310px;
   height: 63px;
   /*  background: inherit;
   background-color: rgba(255, 255, 255, 1); */
@@ -359,7 +334,6 @@ export default {
   font-size: 30px;
   text-align: center;
 }
-
 .title1 .text {
   position: absolute;
   text-align: center;
@@ -367,7 +341,6 @@ export default {
   box-sizing: border-box;
   width: 100%;
 }
-
 .title1 .text p {
   margin: 5px;
   //text-rendering: optimizeLegibility;
@@ -378,13 +351,13 @@ export default {
   //font-kerning: normal;
   color: #333333;
 }
-
 .title2 {
   border-width: 0px;
   position: absolute;
-  left: 987px;
-  top: 194px;
-  width: 390px;
+  //left: 790px;
+  //top: 150px;
+  margin: 20px 0px 0px 400px;
+  width: 310px;
   height: 63px;
   box-sizing: border-box;
   //border-bottom-width: 6px;
@@ -396,7 +369,6 @@ export default {
   font-size: 30px;
   text-align: center;
 }
-
 .title2 .text {
   position: absolute;
   text-align: center;
@@ -404,18 +376,15 @@ export default {
   box-sizing: border-box;
   width: 100%;
 }
-
 .title2 .text p {
   margin: 5px;
   color: #333333;
 }
-
 .active {
   border-bottom-width: 6px;
   border-style: solid;
   border-color: rgba(9, 109, 217, 1);
 }
-
 .SocialAccountsLogin {
   border-width: 0px;
   position: absolute;
@@ -431,7 +400,6 @@ export default {
   letter-spacing: 2px;
   color: rgba(85, 85, 85, 0.596078431372549);
 }
-
 .WechatLogo {
   border-width: 0px;
   position: absolute;
@@ -441,7 +409,6 @@ export default {
   height: 34px;
   display: flex;
 }
-
 .wechat {
   border-width: 0px;
   position: absolute;
@@ -457,18 +424,17 @@ export default {
   letter-spacing: 2px;
   color: rgba(85, 85, 85, 0.596078431372549);
 }
-
 .loginWithPwd,
 .register {
   border-width: 0px;
   position: absolute;
-  left: 563px;
-  top: 306px;
+  //left: 450px;
+  //top: 250px;
+  margin: 100px 0px 0px 45px;
   width: 794px;
   height: 467px;
   display: flex;
 }
-
 .phone_email,
 .phoneNumber {
   position: absolute;
@@ -478,19 +444,17 @@ export default {
   height: 34px;
   font-family: "Arial Negreta", "Arial Normal", "Arial";
   font-style: normal;
-  font-size: 30px;
+  font-size: 25px;
   text-align: center;
 }
-
 .p_e_input,
 .phoneNumberInput {
   position: absolute;
   left: 200px;
-  top: -40px;
-  width: 538px;
+  top: 0px;
+  width: 400px;
   height: 73px;
 }
-
 .p_e_input .el-input__inner,
 .phoneNumberInput .el-input__inner {
   -webkit-appearance: none;
@@ -507,9 +471,8 @@ export default {
   outline: 0;
   padding: 0 15px;
   transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
-  width: 538px;
+  width: 400px;
 }
-
 .phone_email .el-form-item__error,
 .phoneNumber .el-form-item__error {
   color: #f56c6c;
@@ -521,7 +484,6 @@ export default {
   left: 190px;
   width: 150px;
 }
-
 .pwd,
 .vCode {
   position: absolute;
@@ -534,7 +496,6 @@ export default {
   font-size: 30px;
   text-align: center;
 }
-
 .phone_email .el-form-item__label,
 .pwd .el-form-item__label,
 .phoneNumber .el-form-item__label,
@@ -542,22 +503,20 @@ export default {
   text-align: right;
   vertical-align: middle;
   float: left;
-  font-size: 30px;
+  font-size: 25px;
   color: #333333;
   line-height: 40px;
   padding: 0 12px 0 0;
   box-sizing: border-box;
 }
-
 .pwd_input,
 .vCodeInput {
   position: absolute;
   left: 200px;
-  top: -40px;
-  width: 538px;
+  top: 0px;
+  width: 400px;
   height: 73px;
 }
-
 .pwd_input .el-input__inner,
 .vCodeInput .el-input__inner {
   -webkit-appearance: none;
@@ -574,9 +533,8 @@ export default {
   outline: 0;
   padding: 0 15px;
   transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
-  width: 538px;
+  width: 400px;
 }
-
 .pwd .el-form-item__error,
 .vCode .el-form-item__error {
   color: #f56c6c;
@@ -588,7 +546,6 @@ export default {
   left: 166px;
   width: 150px;
 }
-
 .el-input-group {
   line-height: normal;
   display: inline-table;
@@ -597,30 +554,27 @@ export default {
   border-collapse: separate;
   border-spacing: 0;
 }
-
 .el-input-group__append,
 .el-input-group__prepend {
   left: -142px;
 }
-
 .btn_login,
 .btn_register {
   position: absolute;
-  left: 205px;
-  top: 380px;
-  width: 401px;
-  height: 64px;
+  left: 180px;
+  top: 350px;
+  width: 300px;
+  height: 50px;
   font-family: "Arial Negreta", "Arial Normal", "Arial";
   font-style: normal;
-  font-size: 30px;
+  font-size: 25px;
   text-align: center;
 }
-
 .pwd_forgot {
   border-width: 0px;
   position: absolute;
-  left: 690px;
-  top: 250px;
+  left: 550px;
+  top: 280px;
   width: 125px;
   height: 21px;
   display: flex;
@@ -630,12 +584,11 @@ export default {
   color: #515050;
   text-decoration: none;
 }
-
 .tip {
   border-width: 0px;
   position: absolute;
-  left: 320px;
-  top: 350px;
+  left: 250px;
+  top: 320px;
   width: 200px;
   height: 21px;
   display: flex;
