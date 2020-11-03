@@ -14,7 +14,7 @@
         </div>
         <div class="btn-wrapper">
           <el-button @click="itemClick('/create')" round>创建事件</el-button>
-          <el-button @click="itemClick('/rusult')" round>查看结果</el-button>
+          <el-button @click="itemClick('/result')" round>查看结果</el-button>
         </div>
         <div class="help-wrapper">
           <ul class="help-info">

@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router'
 import './plugins/element.js'
 import "./assets/iconfont/iconfont.css";
+import "./assets/iconfont2/iconfont.css";
 import axios from 'axios';
 import api from './api' // 导入api接口
 import VueCookies from 'vue-cookies'

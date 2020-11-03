@@ -11,6 +11,8 @@ const Choose = () => import('../views/Choose')
 const Result = () => import('../views/Result')
 const CopyLink = () => import('../views/CopyLink')
 const FinalResult = () => import('../views/FinalResult')
+const ChooseSuccess = () => import('../views/ChooseSuccess')
+const UpdateSuccess = () => import('../views/UpdateSuccess')
 
 Vue.use(VueRouter)
 const originalPush = VueRouter.prototype.push
@@ -68,6 +70,14 @@ const routes = [
   {
     path: '/finalresult',
     component: FinalResult
+  },
+  {
+    path: '/cSuccess',
+    component: ChooseSuccess
+  },
+  {
+    path: '/ucSuccess',
+    component: UpdateSuccess
   }
 
 ]

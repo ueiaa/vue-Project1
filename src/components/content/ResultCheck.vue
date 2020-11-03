@@ -33,20 +33,33 @@
             <div slot="header" class="clearfix">
                 <span>回应列表</span>               
             </div>
-            <!-- <el-tree
-              :data="data"
-              show-checkbox
-              node-key="id"
-              :default-expanded-keys="[0, 1]"
-              :default-checked-keys="[5]"
-              :props="defaultProps">
-            </el-tree> -->
+ 
             <el-scrollbar style="height: 100%">
-            <div class="responseList">
-              <div v-for="o in 3" :key="o" class="item2">
-              {{'列表内容 ' + o }}
-              </div>
-            </div>
+             <div class="responseList">
+               <div class="checkAll">
+               <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">
+                全选
+               </el-checkbox>
+               <i class="icon iconfont iconkejian" v-show="kjIsShow" @click="changeBtn"></i>
+               <i class="icon iconfont iconbukejian" v-show="bkjIsShow" @click="changeBtn2"></i>
+               <i class="icon iconfont iconyoujian"></i>
+               <i class="icon iconfont iconshanchu"></i>
+               <div class="line"></div>
+               </div>
+               
+              <el-checkbox-group v-model="checkedOne" @change="handleCheckedChange">
+                <el-checkbox
+                  class="checkOne" 
+                  v-for="(item,i) in responseList"
+                  :key="i"
+                  :label="item.name"
+                 
+                 >{{item.name}} 
+                 </el-checkbox>
+                
+              </el-checkbox-group>
+             </div>
+             
             </el-scrollbar>
             
         </el-card>
@@ -55,13 +68,13 @@
 
      <!-- 右侧栏 -->
      <div class="right_wrapper">
-        <el-dialog title="能参加的人" :visible.sync="dialogTableVisible1" append-to-body="true">
+        <el-dialog title="能参加的人" :visible.sync="dialogTableVisible1" :append-to-body="true">
           <span slot="footer" class="dialog-footer">
             <el-button type="primary" @click="dialogTableVisible1 = false">确 定</el-button>
           </span>
         </el-dialog>
 
-        <el-dialog title="不能参加的人" :visible.sync="dialogTableVisible2" append-to-body="true">
+        <el-dialog title="不能参加的人" :visible.sync="dialogTableVisible2" :append-to-body="true">
           <span slot="footer" class="dialog-footer">
             <el-button type="primary" @click="dialogTableVisible2 = false">确 定</el-button>
           </span>
@@ -97,15 +110,25 @@
         
      </div>
 
+     <!-- 下侧留言栏 -->
+     <div class="bottom_wrapper">
+       <el-card class="box-card_bottom" shadow="hover">
+         <div slot="header" class="clearfix">
+                <span>他们的留言</span>
+         </div>
+       </el-card>
+     </div>
+
    </div>
  </div>
 </template>
 <script>
-
 export default {
+  
     name: 'ResultCheck',
     data(){
         return{
+          
             eventName: "我的事件",
             eventInfo: "事件具体描述",
             eventDate: "2020-10-28",
@@ -114,41 +137,143 @@ export default {
             canNotDo: "10(100%)",
             dialogTableVisible1: false,
             dialogTableVisible2: false,
-            data: [{
-          id: 1,
-          label: '一级 1',
-          children: [{
-            id: 4,
-            label: '二级 1-1',
+            checkAll:false,
+            isIndeterminate: true,
             
-          }]
-        }, ],
-        defaultProps: {
-          children: 'children',
-          label: 'label'
-        }
+            responseList: [
+              {
+                id:'0',
+                name: 'vv'
+              },{
+                id:'1',
+                name: 'aa'
+              },{
+                id:'2',
+                name: 'aa'
+              },{
+                id:'3',
+                name: 'aa'
+              },{
+                id:'4',
+                name: 'aa'
+              },{
+                id:'5',
+                name: 'aa'
+              },{
+                id:'6',
+                name: 'aa'
+              },{
+                id:'7',
+                name: 'aa'
+              },{
+                id:'8',
+                name: 'aa'
+              }
+            ],
+        
+            checkedOne:[],
+            allElection: [], // 全选
+            selectionArr: [], // 选中要传给后台的数据 对象
             
+            kjIsShow: true,
+            bkjIsShow: false
+           
         }
     },
     mounted(){
-     
+      this.allElectionFun();
+      this.DefaultFullSelection();
+    },
+    created() {
+      
     },
     methods: {
       //跳转
       itemClick(path) {
         this.$router.push(path);
       },
+
+      allElectionFun() { // 获取需要默认显示的数据
+           this.allElection = [];
+             for (var i = 0; i < this.responseList.length; i++) {
+               this.allElection.push(this.responseList[i].name)
+           }
+      },
+
+      DefaultFullSelection() {
+        // 初始化 默认全部选中
+        this.checkedOne = this.allElection;
+        let checkedCount = this.checkedOne.length;
+        this.checkAll = checkedCount === this.responseList.length;
+        this.isIndeterminate = checkedCount > 0 && checkedCount < this.responseList.length;
+        this.selectionFun(this.checkedOne);
+      },
+
+      selectionFun(selectionArr) { // 获取选中的对象
+                this.selectionArr = [];
+                for (var i = 0; i < this.responseList.length; i++) {
+                  for (var j = 0; j < selectionArr.length; j++) {
+                          if (selectionArr[j] === this.responseList[i].name) {
+                            this.selectionArr.push(this.responseList[i])
+                      }
+                      }
+                }
+      },
+
+      handleCheckAllChange(val) { // 全选
+        this.allElectionFun();
+         this.checkedOne = val ? this.allElection : [];
+         this.isIndeterminate = false;
+           // console.log(this.checkedCities);
+              this.selectionFun(this.checkedOne);
+             console.log(this.selectionArr)
+      },
+
+      handleCheckedChange(value) { // 选中
+             let checkedCount = value.length;
+             this.checkAll = checkedCount === this.responseList.length;
+              this.isIndeterminate = checkedCount > 0 && checkedCount < 
+              this.responseList.length;
+               this.selectionFun(value);
+             console.log(this.selectionArr)
+      },
+
+      changeBtn(){
+            this.kjIsShow = !this.kjIsShow
+            if(this.kjIsShow){
+                this.kjIsShow = true;
+                this.checkAll = true;
+            }else{
+                this.bkjIsShow = true;
+                this.checkAll = false;
+                this.checkedOne = false;
+            }
+      },
+
+      changeBtn2(){
+            this.bkjIsShow = !this.bkjIsShow
+            if(this.bkjIsShow){
+                this.kjIsShow = false;
+                this.checkAll = false;
+            }else{
+                this.kjIsShow = true;
+                this.checkAll = true;
+                this.checkedOne = true;
+            }
+      },
+
+
     }
 }
 </script>
-<style lang="less">
+<style scoped>
 #box{
     width: 100%;
     height: 100%;
-    position: fixed;
+    /* position: fixed; */
     top: 0px;
     bottom: 0px;
-    overflow: scroll;
+    /* overflow: scroll; */
 }
 
 .base{
@@ -220,8 +345,6 @@ export default {
     position: absolute;
     top:400px;
     left: 40px;
-    
-    
 }
 
 .box-card2 {
@@ -232,42 +355,51 @@ export default {
 
 .el-scrollbar__bar{
   overflow: hidden;
+  bottom: 0;
 }
 
 .el-scrollbar__bar.is-horizontal {
-    height: 0px;
-   
+    height: 0px; 
 }
 
 .responseList{
   height: 280px;
   width: 200px;
-  
-  
 }
-/* ::-webkit-scrollbar
-{
-  width:0;
-} */
-
-/* .el-scrollbar__bar.is-vertical {
-    width: 6px;
-    top: 2px;
-} */
 
 .el-scrollbar__wrap {
    overflow-x: hidden;
 }
 
-/* .el-scrollbar__bar {
-    position: absolute;
-    right: 2px;
-    bottom: 2px;
-    z-index: 1;
-    border-radius: 4px;
-    opacity: 0;
-    transition: opacity .12s ease-out;
-} */
+.checkAll{
+  width: 200px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.checkOne{
+  width: 200px;
+  margin-bottom: 10px;
+}
+
+.icon{
+  position: absolute;
+  left: 90px;
+  cursor: pointer;
+}
+
+.iconyoujian{
+  position: absolute;
+  left: 115px;
+  cursor: pointer;
+}
+
+.iconshanchu{
+  position: absolute;
+  left: 140px;
+  cursor: pointer;
+}
 
 .right_wrapper{
     position: absolute;
@@ -311,5 +443,16 @@ export default {
 .can .content{
   color: #409EFF;
 }
- 
+
+.bottom_wrapper{
+  position: absolute;
+  top: 700px;
+  left: 340px;
+}
+
+.box-card_bottom{
+  height: 200px;
+  width: 500px;
+}
+
 </style>

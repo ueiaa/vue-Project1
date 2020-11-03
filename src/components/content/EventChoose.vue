@@ -47,7 +47,7 @@
       </div>
 
       <div class="info_content">
-       <el-form ref="info_content_ref" :model="info_content" :rules="info_content_rules">
+       <el-form ref="info_content" :model="info_content" :rules="info_content_rules">
         <el-form-item label="您的姓名" class="info_content_name"  prop="name">
           <el-input class="info_name_edit" v-model="info_content.name"></el-input>
         </el-form-item>
@@ -56,10 +56,10 @@
           <el-input class="info_comment_edit" type="textarea" v-model="info_content.comment"></el-input>
         </el-form-item>
 
-        <el-radio class="info_content_public" v-model="radio" label="1">公开我的选择（勾选后，您的时间将会被其他参与者所查看）</el-radio>
+        <el-checkbox class="info_content_public" v-model="checked">公开我的选择（勾选后，您的时间将会被其他参与者所查看）</el-checkbox>
 
         <el-form-item>
-          <el-button class="btn_submit" type="primary" @click="info_content_ref" style="font-size:30px;">提交</el-button>
+          <el-button class="btn_submit" type="primary" @click="itemClick('/cSuccess');info_content();" style="font-size:30px;">提交</el-button>
         </el-form-item>
       </el-form>
       </div>
@@ -85,7 +85,7 @@ export default {
               name: "",
               comment: "",
             },
-            radio: '0',
+            checked: true,
             //表单规则验证对象
             info_content_rules: {
               name: [
@@ -109,7 +109,10 @@ export default {
     },
 
     methods: {
-
+        //跳转
+        itemClick(path) {
+          this.$router.push(path);
+        },
        
         changeBtn(){
             this.isShow = !this.isShow
@@ -127,10 +130,10 @@ export default {
 #box{
     width: 100%;
     height: 100%;
-    position: fixed;
+    /* position: fixed; */
     top: 0px;
     bottom: 0px;
-    overflow: scroll;
+    /* overflow: scroll; */
 }
 
 .base{
@@ -173,7 +176,7 @@ export default {
 .tips{
   position: absolute;
   top: 120px;
-  left: 750px;
+  left: 950px;
 }
 
 .timeTips1 {
@@ -229,7 +232,7 @@ export default {
 }
 
 .info{
-  position: relative;
+  position: absolute;
   top: 500px;
   left: 450px;
 }
