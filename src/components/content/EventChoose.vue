@@ -24,19 +24,21 @@
         <div class="timeTips2"></div>
         <div class="timeTips2_text">
             <p>
-                <span>其他参与者选择的时间</span>
+                <span>您以及其他参与者选择的时间</span>
             </p>
         </div>
-        <div>
+        <!-- <div>
             <button class="btn_pb" @click="changeBtn" v-text="btnText"></button>
             <div class="test" v-show="isShow"></div>
             
-        </div>
+        </div> -->
     </div>
 
-
     <!-- 日历区 -->
-    <calendar-grid></calendar-grid>
+    <Calendar @getTimeUnit='getTimeUnit' 
+              @getTimeUnitId='getTimeUnitId'
+              :Datas='datasToCalendar'/>
+    <button @click="changeCalendarFormat">try</button>>
 
     <!-- 填写信息区 -->
     <div class="info">
@@ -56,73 +58,165 @@
           <el-input class="info_comment_edit" type="textarea" v-model="info_content.comment"></el-input>
         </el-form-item>
 
-        <el-checkbox class="info_content_public" v-model="checked">公开我的选择（勾选后，您的时间将会被其他参与者所查看）</el-checkbox>
-
+        <!-- <el-checkbox class="info_content_public" v-model="checked">公开我的选择（勾选后，您的时间将会被其他参与者所查看）</el-checkbox>
+ -->
         <el-form-item>
           <el-button class="btn_submit" type="primary" @click="itemClick('/cSuccess');info_content();" style="font-size:30px;">提交</el-button>
         </el-form-item>
       </el-form>
       </div>
     </div>
-    </div>
+
+   </div>
   </div>  
 </template>
 
 <script>
-import CalendarGrid from "./CalendarGrid"
+import Calendar from "./FullCalendar"
 export default {
   name: 'EventChoose',
+  components: {
+    Calendar
+  },
 
-    data() {
-        return {
-            eventName: "我的事件",
-            eventInfo: "事件具体描述",
-            isShow: true,
-            btnText: "屏蔽其他参与者选择的时间",
+  data() {
+    return {
+      eventName: "我的事件",
+      eventInfo: "事件具体描述",
+      isShow: true,
+      btnText: "屏蔽其他参与者选择的时间",
             
-            //表单数据绑定对象
-            info_content: {
-              name: "",
-              comment: "",
-            },
-            checked: true,
-            //表单规则验证对象
-            info_content_rules: {
-              name: [
-                { required:true, message:'请输入您的姓名', trigger: 'blur'}
-              ]
+      //表单数据绑定对象
+      info_content: {
+        name: "",
+        comment: "",
+      },
+      checked: true,
+        //表单规则验证对象
+        info_content_rules: {
+          name: [
+            { required:true, message:'请输入您的姓名', trigger: 'blur'}
+          ]
+        },
+
+      /* 日历相关 */
+      /***************************
+       *   传给日历组件的数据
+      ***************************/ 
+      datasToCalendar: {
+        /***************************
+        *   日历格式相关的数据
+        ***************************/ 
+        calendarFormat: {
+          // 设置默认显示的时间间隔
+          slotDuration: '01:00', // 1 hours
+          // 选择的时间的默认间隔（应与slotDuration保持一致）
+          defaultTimedEventDuration: '01:00',
+          // 日历显示的最早时间
+          slotMinTime: "06:00:00",
+          // 日历显示的最晚时间
+          slotMaxTime: "22:00:00",
+          // 强调日历中的某些时间段
+          businessHours: {
+            daysOfWeek: [ 1, 2, 3, 4, 5, 6, 0], // 0是星期天，1-6周一到周六
+            startTime: '08:00', // 高亮开始时间
+            endTime: '20:00', // 高亮结束时间
+          },
+          // 隐藏一周当中的某天
+          hiddenDays: [  ], // 隐藏周二
+          // 日历开始于结束的时间
+          validRange: {
+            start: '2020-10-11',
+            end: '2020-11-11'
+          },
+        },
+        /***************************
+        *    与日历在各个页面
+        *    的功能有关的数据
+        ***************************/ 
+        calendarFunction: {
+          // 日历是否可选
+          selectable: true,
+          // 背景时间：用于显示发起者未选择的时间
+          // 一开始是空，根据后端返回的数据进行初始化
+          events: [
+            {
+              // 传入的数据应该是发起者未选择的时间
+              groupId: "hostChoose",
+              id: '2020-11-02-10:00:00-1',
+              start: '2020-11-02T10:00:00',
+              // end: '2020-11-01T16:00:00',
+              // display: 'background',
+              // backgroundColor: 'red'
+              backgroundColor: '#FF6633',
+              title: '1'
             }
+          ],
+          pages: 'select',   // 这里有三个选项：create、select、result 对应3个页面
         }
+      },
+      // 结果页面被选中的时间块的id
+      idOfSelectTime: ''
+    }
 
-    },
+  },
 
-    mounted () {
+  mounted () {
         /* this.$api{
            if(res.data.code === 200){
                this.eventName = res.data.eventName;
            } 
         } */
-    },
+  },
 
-    created () {
+  created () {
       
+  },
+
+  methods: {
+    //跳转
+    itemClick(path) {
+      this.$router.push(path);
+    },
+       
+    changeBtn(){
+      this.isShow = !this.isShow
+        if(this.isShow){
+          this.btnText = "屏蔽其他参与者选择的时间";
+        }else{
+          this.btnText = "显示其他参与者选择的时间";
+        }
     },
 
-    methods: {
-        //跳转
-        itemClick(path) {
-          this.$router.push(path);
-        },
-       
-        changeBtn(){
-            this.isShow = !this.isShow
-            if(this.isShow){
-                this.btnText = "屏蔽其他参与者选择的时间";
-            }else{
-                this.btnText = "显示其他参与者选择的时间";
-            }
-        },
+    /* 日历相关 */
+    // 与日历组件通信，时时更新this.datasToCalendar.calendarFunction.events
+    getTimeUnit(timeUnit) {
+      this.datasToCalendar.calendarFunction.events = timeUnit;
+    },
+    // 结果页面点击时间块的时候，子组件发送时间块的id给父组件
+    getTimeUnitId(id) {
+      this.idOfSelectTime = id;
+    },
+    // 动态调整日历的格式：实现的时候与表单进行绑定（第三期任务）
+    changeCalendarFormat() {
+      let formatapi = this.datasToCalendar.calendarFormat;
+  
+      formatapi.slotDuration = '00:30' 
+      formatapi.defaultTimedEventDuration = '00:30'
+      formatapi.slotMinTime = "10:00:00"
+      formatapi.slotMaxTime = "20:00:00"
+      formatapi.businessHours = {
+        daysOfWeek: [ 1, 2, 3, 5, 6, 0],
+        startTime: '11:00',
+        endTime: '19:00', 
+      }
+      formatapi.hiddenDays = [1,4]
+      formatapi.validRange = {
+        start: '2020-11-11',
+        end: '2020-11-19'
+      }
     }
+  }
 };
 </script>
 
@@ -146,7 +240,7 @@ export default {
 .title{
   position: absolute;
   top: 130px;
-  left: 200px;
+  left: 150px;
 }
 
 .eventName {
@@ -175,15 +269,15 @@ export default {
 
 .tips{
   position: absolute;
-  top: 120px;
-  left: 950px;
+  top: 130px;
+  left: 860px;
 }
 
 .timeTips1 {
   position: absolute;
   width: 15px;
   height: 15px;
-  background-color: #BAE7FF;
+  background-color: #3788d8;
 }
 
 .timeTips1_text {
@@ -203,14 +297,14 @@ export default {
   width: 15px;
   height: 15px;
   display: flex;
-  background-color: #40A9FF;
+  background-color: #003399;
 }
 
 .timeTips2_text {
   position: absolute;
   top: 20px;
   left: 25px;
-  width: 180px;
+  width: 220px;
   height: 22px;
   font-weight: 600;
   font-size: 14px;
@@ -233,7 +327,7 @@ export default {
 
 .info{
   position: absolute;
-  top: 500px;
+  top: 750px;
   left: 450px;
 }
 
@@ -366,7 +460,7 @@ export default {
 .btn_submit {
   position: absolute;
   left: 150px;
-  top: 300px;
+  top: 250px;
   width: 250px;
   height: 50px;
   font-size: 22px;
