@@ -19,9 +19,9 @@
                 <span>选项</span>               
             </div>
             <div class="item" >
-                <p type="text" @click="itemClick('/copyLink')">邀请更多人</p>
-                <p @click="itemClick('/choose')">增加回应</p>
-                <p @click="itemClick('/create_edit')">编辑事件</p>
+                <p type="text" @click="copyLink()">邀请更多人</p>
+                <p @click="eventChoose()">增加回应</p>
+                <p @click="itemClick('/create')">编辑事件</p>
             </div>
         </el-card>
      </div>
@@ -214,8 +214,8 @@ export default {
          hiddenDays: [  ], // 隐藏周二
          // 日历开始于结束的时间
          validRange: {
-         start: '2020-10-11',
-         end: '2020-11-11'
+         start: '2020-11-01',
+         end: '2020-11-30'
          },
       },
       /***************************
@@ -251,6 +251,10 @@ export default {
     mounted(){
       this.allElectionFun();
       this.DefaultFullSelection();
+      this.$api.event.getFinalResult(this.$route.params.eventCode,this.$route.params.hostCode,{
+        eventCode: this.$route.params.eventCode,
+        hostCode: this.$route.params.hostCode
+      })
     },
     created() {
       
@@ -259,6 +263,14 @@ export default {
       //跳转
       itemClick(path) {
         this.$router.push(path);
+      },
+
+      eventChoose(){
+        this.$router.push({ name: 'choose', params: { eventCode: this.$route.params.eventCode}});
+      },
+
+      copyLink(){
+        this.$router.push({ name: 'copyLink', params: { eventCode: this.$route.params.eventCode}});
       },
 
       allElectionFun() { // 获取需要默认显示的数据

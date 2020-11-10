@@ -10,9 +10,17 @@ const Faqs = () => import('../views/Faqs')
 const Choose = () => import('../views/Choose')
 const Result = () => import('../views/Result')
 const CopyLink = () => import('../views/CopyLink')
-const FinalResult = () => import('../views/FinalResult')
+/* const FinalResult = () => import('../views/FinalResult') */
 const ChooseSuccess = () => import('../views/ChooseSuccess')
 const UpdateSuccess = () => import('../views/UpdateSuccess')
+const Update = () => import('../views/Update')
+const EnterResults = () => import('../views/EnterResults')
+
+const CreateEvent = () => import('../views/create_event/CreateEvent')
+const ShareLinks = () => import('../views/create_event/ShareLinks')
+const FinalResult = () => import('../views/result/FinalResult')
+
+
 
 Vue.use(VueRouter)
 const originalPush = VueRouter.prototype.push
@@ -56,15 +64,18 @@ const routes = [
     component: Faqs
   },
   {
-    path: '/choose',
+    path: '/:eventCode',
+    name: 'choose',
     component: Choose
   },
   {
-    path: '/result',
+    path: '/:eventCode/result/:hostCode',
+    name: 'result',
     component: Result
   },
   {
-    path: '/copylink',
+    path: '/:eventCode/copylink',
+    name: 'copyLink',
     component: CopyLink
   },
   {
@@ -72,12 +83,40 @@ const routes = [
     component: FinalResult
   },
   {
-    path: '/cSuccess',
+    path: '/:eventCode/thanks/:idCode',
+    name: 'cSuccess',
     component: ChooseSuccess
   },
   {
     path: '/ucSuccess',
     component: UpdateSuccess
+  },
+  {
+    path: '/:eventCode/update/:idCode',
+    name: 'update',
+    component: Update
+  },
+  {
+    path: '/EnterResults',
+    component: EnterResults
+  },
+
+  {
+    path: '/create',
+    component: CreateEvent
+  },
+  {
+    path: '/:eventCode/sharelinks/:hostCode',
+    name: 'sharelinks',
+    component: ShareLinks
+  },
+  {
+    path: '/result',
+    component: FinalResult
+  },
+  {
+    path: '/result/final',
+    component: FinalResult
   }
 
 ]

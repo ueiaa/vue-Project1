@@ -4,7 +4,8 @@
             <img class="logo" src="@/assets/img/success.png" alt="">
             <p class="finish"><span>提交成功！</span></p>
             <p class="link">
-                <span>{{ updateLink }}</span>
+                <span @click="link()">http://localhost:8080/{{ eventCode }}/update/{{ idCode }}</span>
+               <!-- <router-link to="{ name: 'update', params: { eventCode: 'ipia2cn',idCode: 'pgadf27a' }}">http://localhost:8080/{{ eventCode }}/update/{{ idCode }}</router-link> -->       
             </p>
             <p class="p1">
                 <span>您可以<span class="login" @click="itemClick('/login')">登录</span>保存您的事件</span>
@@ -41,7 +42,8 @@ export default {
             callback(new Error("请输入正确的手机号码"));
         };
         return{
-            updateLink: "updateLink",
+            eventCode: this.$route.params.eventCode,
+            idCode: this.$route.params.idCode,
             dialogFormVisible: false,
             form: {
                 phoneNumber: '',
@@ -59,6 +61,9 @@ export default {
 
     },
     methods: {
+        link(){
+            this.$router.push({ name: 'update', params: { eventCode: 'ipia2cn',idCode: 'pgadf27a' }});
+        },
         itemClick(path){
             this.$router.push(path);
         }
@@ -104,7 +109,7 @@ export default {
 
 .link{
     position: absolute;
-    left: 550px;
+    left: 430px;
     top: 400px;
     width: 100px;
     height: 50px;

@@ -54,3 +54,9 @@ export function timeUnitIdToTime(id) {
   let time = id.substring(0, 10) + 'T' + id.substring(11, 19);
   return time;
 }
+
+// 将传回来的timeUnit解析为字符串数组
+export function timeUnitSpilt(timeUnit) {
+  let timeStr = timeUnit.toString().spilt(",");
+  return timeStr;
+}

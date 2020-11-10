@@ -1,5 +1,5 @@
 <template>
-  <div id="box">
+  <div id="box" v-if="box">
     <div class="base">
 
     <!-- 事件名称与描述 -->    
@@ -10,6 +10,10 @@
 
         <div class="eventInfo">
             <p><span>{{ eventInfo }}</span></p>
+        </div>
+
+        <div class="eventDuration">
+            <p><span>持续时间：{{ eventDuration }}小时</span></p>
         </div>
     </div>
 
@@ -61,7 +65,9 @@
         <!-- <el-checkbox class="info_content_public" v-model="checked">公开我的选择（勾选后，您的时间将会被其他参与者所查看）</el-checkbox>
  -->
         <el-form-item>
-          <el-button class="btn_submit" type="primary" @click="itemClick('/cSuccess');info_content();" style="font-size:30px;">提交</el-button>
+          <el-button class="btn_submit" type="primary" @click="choose('info_content');" style="font-size:30px;">
+            提交
+          </el-button>
         </el-form-item>
       </el-form>
       </div>
@@ -73,6 +79,7 @@
 
 <script>
 import Calendar from "./FullCalendar"
+import { createTimeUnitId,timeUnitIdToTime,timeUnitSpilt } from '@/utils/calendar-utils'
 export default {
   name: 'EventChoose',
   components: {
@@ -81,8 +88,10 @@ export default {
 
   data() {
     return {
-      eventName: "我的事件",
-      eventInfo: "事件具体描述",
+      box: false,
+      eventName: '',
+      eventInfo: '',
+      eventDuration: '',
       isShow: true,
       btnText: "屏蔽其他参与者选择的时间",
             
@@ -126,8 +135,8 @@ export default {
           hiddenDays: [  ], // 隐藏周二
           // 日历开始于结束的时间
           validRange: {
-            start: '2020-10-11',
-            end: '2020-11-11'
+            start: '2020-10-20',
+            end: '2020-12-20'
           },
         },
         /***************************
@@ -136,7 +145,7 @@ export default {
         ***************************/ 
         calendarFunction: {
           // 日历是否可选
-          selectable: true,
+          selectable: false,
           // 背景时间：用于显示发起者未选择的时间
           // 一开始是空，根据后端返回的数据进行初始化
           events: [
@@ -167,26 +176,137 @@ export default {
                this.eventName = res.data.eventName;
            } 
         } */
+      /* this.$api.eventinfo.getEventInfo(this.$route.params.eventCode,
+        {
+          hostCode: this.$route.params.eventCode
+        }
+      ).then(res => {
+        console.log(res.data)
+        if(res.data.code === 200){
+          this.eventName = res.data.eventName;
+          this.eventInfo = res.data.eventDescription;
+          this.eventDuration = res.data.eventDuration;
+        }
+      }) */
   },
 
   created () {
-      
+      this.initData();
   },
 
   methods: {
+    initData(){
+      let formatapi = this.datasToCalendar.calendarFormat;  
+      let eventapi = this.datasToCalendar.calendarFunction;
+      
+          // 已经选择时间，对传给后端的数据进行处理
+                        /* let showDay = '';
+                        if(formatapi.hiddenDays.length > 0) {
+                            showDay = formatapi.hiddenDays[0];
+                            for (let index = 1; index < formatapi.hiddenDays.length; index++) {
+                                showDay += ',' + formatapi.hiddenDays[index];
+                            }
+                        } */
+            
+            
+            let eventsId = eventapi.events[0].id;
+            let eventsBack = eventapi.events[0].backgroundColor;
+            
+          
+    this.$api.event.getResultByCode(this.$route.params.eventCode,
+        {
+          eventCode: this.$route.params.eventCode
+        }
+      ).then(res => {
+        console.log(res.data)
+        /* console.log(typeof(res.data.data.timeUnit)) */
+        if(res.data.code === 200){
+          this.eventName = res.data.data.eventName;
+          this.eventInfo = res.data.data.eventDescription;
+          this.eventDuration = res.data.data.eventDuration;
+          let time = res.data.data.timeUnit;
+
+          let timeStr = time.split(",");
+          for (let index = 1; index < timeStr.length; index++) {
+              eventsId += timeStr[index].timeUnitIdToTime;
+              eventsBack = "#FF6633";
+          }
+        }
+      })
+      this.box = true;
+  },
+
     //跳转
-    itemClick(path) {
-      this.$router.push(path);
+    itemClick(info_content) {
+      this.$refs[info_content].validate((valid) => {
+        if(valid){
+        this.$router.push({ name: 'cSuccess', params: { eventCode: 'ipia2cn',idCode: 'pgadf27a' }});
+        }else{
+          alert('请填写您的姓名')
+        }
+      })
+    },
+
+    choose(info_content) {
+      
+      this.$refs[info_content].validate((valid) => {
+        if (valid) {
+          let formatapi = this.datasToCalendar.calendarFormat;  
+          let eventapi = this.datasToCalendar.calendarFunction;
+          // 判断是否已经选择时间
+          if(eventapi.events.length > 0) {
+          // 已经选择时间，对传给后端的数据进行处理
+                        /* let showDay = '';
+                        if(formatapi.hiddenDays.length > 0) {
+                            showDay = formatapi.hiddenDays[0];
+                            for (let index = 1; index < formatapi.hiddenDays.length; index++) {
+                                showDay += ',' + formatapi.hiddenDays[index];
+                            }
+                        } */
+            
+            if(eventapi.events.groupId === 'inviteeSelect'){
+              let idTo = eventapi.events.id;
+            };
+            let eventsId = eventapi.events[0].id;
+            for (let index = 1; index < eventapi.events.length; index++) {
+              eventsId += ',' + eventapi.events[index].id;
+            }
+          }
+            this.$api.event.attendEvent(this.$route.params.eventCode,{
+              
+                eventCode: this.$route.params.eventCode,
+                timeUnit: idTo,
+                name: this.info_content.name,
+                comment: this.info_content.comment,
+                isTimePublic: 1
+            }).then(res => {
+              //console.log(res.data)
+              if (res.data.code == 200) {
+               
+                this.$router.push({ name: 'cSuccess', params: { eventCode: this.$route.params.eventCode,idCode: res.data.data.idCode }});
+              }else{
+                alert('请求失败')
+              }
+            }).catch(error => {
+              console.log(error);
+            });
+            
+        }else {
+          console.log("error submit!!");
+          return false;
+        }
+      
+      });
     },
        
-    changeBtn(){
+    /* changeBtn(){
       this.isShow = !this.isShow
         if(this.isShow){
           this.btnText = "屏蔽其他参与者选择的时间";
         }else{
           this.btnText = "显示其他参与者选择的时间";
         }
-    },
+    }, */
 
     /* 日历相关 */
     // 与日历组件通信，时时更新this.datasToCalendar.calendarFunction.events
@@ -258,6 +378,18 @@ export default {
 .eventInfo {
   position: absolute;
   top: 50px;
+  width: 217px;
+  height: 42px;
+  font-family: "Arial Negreta", "Arial Normal", "Arial";
+  font-weight: 600;
+  font-style: normal;
+  font-size: 18px;
+  color: #333333;
+}
+
+.eventDuration {
+  position: absolute;
+  top: 80px;
   width: 217px;
   height: 42px;
   font-family: "Arial Negreta", "Arial Normal", "Arial";

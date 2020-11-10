@@ -9,10 +9,12 @@
             <span>将以下链接分享给TA</span>
             
             <div class="form">
-              <span class="url">{{ inviteLink }}</span>
+             <div class="link">
+              <span class="url" @click="link()">{{ eventChoose }}</span>
+             </div>
               <br>
               <el-button class="btnCopy"
-                         v-clipboard:copy="inviteLink"
+                         v-clipboard:copy="eventChoose"
                          v-clipboard:success="onCopy"
                          v-clipboard:error="onError"
                          type="primary"
@@ -33,9 +35,7 @@ export default {
     name: 'CopyLinkCpn',
     data(){
         return{
-            
-            inviteLink: 'https://inviteLink',
-            
+          eventChoose: 'http://localhost:8080/' + this.$route.params.eventCode,
         }
     },
     mounted(){
@@ -47,7 +47,11 @@ export default {
       },
       onError: function (e) {
         alert('复制失败')
-      }
+      },
+
+      link(){
+            this.$router.push({ name: 'choose', params: { eventCode: this.$route.params.eventCode}});
+      },
     }
 }
 </script>
@@ -87,6 +91,12 @@ export default {
 
 .url{
   margin-top: 20px;
+  color: #69c0ff;
+  cursor: pointer;
+}
+
+.link :hover{
+  text-decoration: underline #69c0ff;
 }
 
 .btnCopy{
