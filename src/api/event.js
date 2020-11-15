@@ -30,7 +30,7 @@ const event = {
     //提交参与者选择的时间与填写的信息
     //attendEvent
     attendEvent(eventCode,params) {
-        return axios.post(base.baseUrl + `/${eventCode}`, null, {
+        return axios.post(base.baseUrl + `/${eventCode}/`, null, {
             params: params
         });
     },
@@ -63,8 +63,8 @@ const event = {
         });
     },
     // 提交最终时间
-    selectFinalTime(params) {
-        return axios.post(base.baseUrl + `${eventCode}/final/${hostCode}`, null, {
+    selectFinalTime(eventCode,hostCode,params) {
+        return axios.post(base.baseUrl + `/${eventCode}/final/${hostCode}`, null, {
             params: params
         });
     },
@@ -74,7 +74,7 @@ const event = {
      */
     // 获取最终结果
     getFinalResult(eventCode,hostCode,params) {
-        return axios.post(base.baseUrl + `${eventCode}/result/${hostCode}`, null, {
+        return axios.post(base.baseUrl + `/${eventCode}/result/${hostCode}`, null, {
             params: params
         });
     }   

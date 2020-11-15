@@ -10,14 +10,11 @@ import userinfo from '@/api/userinfo';
 import verifycode from '@/api/verifycode';
 
 //2
-//日历渲染
-import eventinfo from '@/api/eventinfo';
+
 
 //参与者选择时间
 import eventcode from '@/api/eventcode';
 
-//getResultByCode
-import enterResultsCode from '@/api/enterResultsCode';
 
 import event from '@/api/event';
 
@@ -27,8 +24,6 @@ export default {
     login,
     userinfo,
     verifycode,
-    eventinfo,
     eventcode,
-    enterResultsCode,
     event
 }

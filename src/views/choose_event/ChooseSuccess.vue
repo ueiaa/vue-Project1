@@ -1,5 +1,6 @@
 <template>
     <div id="box">
+        <page-tab-bar></page-tab-bar>
         <div class="base">
             <img class="logo" src="@/assets/img/success.png" alt="">
             <p class="finish"><span>提交成功！</span></p>
@@ -30,8 +31,12 @@
     </div>
 </template>
 <script>
+import PageTabBar from '@/components/content/tabbar/PageTabBar'
 export default {
     name: 'Success',
+    components: {
+        PageTabBar
+    },
     data(){
         var checkPhoneNumber = (rule, value, callback) => {
             const regPhone = /[0-9]{11}/;

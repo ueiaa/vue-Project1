@@ -56,7 +56,7 @@ export function timeUnitIdToTime(id) {
 }
 
 // 将传回来的timeUnit解析为字符串数组
-export function timeUnitSpilt(timeUnit) {
-  let timeStr = timeUnit.toString().spilt(",");
+export function timeUnitSplit(timeUnit) {
+  let timeStr = timeUnit.toString().split(",");
   return timeStr;
 }

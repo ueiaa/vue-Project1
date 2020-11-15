@@ -7,19 +7,18 @@ const SetPsw = () => import('../views/reset_psw/SetPsw')
 const SetSuccess = () => import('../views/reset_psw/SetSuccess')
 const Login = () => import('../views/Login')
 const Faqs = () => import('../views/Faqs')
-const Choose = () => import('../views/Choose')
-const Result = () => import('../views/Result')
-const CopyLink = () => import('../views/CopyLink')
-/* const FinalResult = () => import('../views/FinalResult') */
-const ChooseSuccess = () => import('../views/ChooseSuccess')
-const UpdateSuccess = () => import('../views/UpdateSuccess')
-const Update = () => import('../views/Update')
-const EnterResults = () => import('../views/EnterResults')
 
 const CreateEvent = () => import('../views/create_event/CreateEvent')
 const ShareLinks = () => import('../views/create_event/ShareLinks')
-const FinalResult = () => import('../views/result/FinalResult')
+const Edit = () => import('../views/create_event/Edit')
 
+const Choose = () => import('../views/choose_event/Choose')
+const ChooseSuccess = () => import('../views/choose_event/ChooseSuccess')
+
+const EnterResults = () => import('../views/result/EnterResults')
+const Result = () => import('../views/result/Result')
+const CopyLink = () => import('../views/result/CopyLink')
+const FinalResult = () => import('../views/result/FinalResult')
 
 
 Vue.use(VueRouter)
@@ -63,43 +62,6 @@ const routes = [
     path: '/faqs',
     component: Faqs
   },
-  {
-    path: '/:eventCode',
-    name: 'choose',
-    component: Choose
-  },
-  {
-    path: '/:eventCode/result/:hostCode',
-    name: 'result',
-    component: Result
-  },
-  {
-    path: '/:eventCode/copylink',
-    name: 'copyLink',
-    component: CopyLink
-  },
-  {
-    path: '/finalresult',
-    component: FinalResult
-  },
-  {
-    path: '/:eventCode/thanks/:idCode',
-    name: 'cSuccess',
-    component: ChooseSuccess
-  },
-  {
-    path: '/ucSuccess',
-    component: UpdateSuccess
-  },
-  {
-    path: '/:eventCode/update/:idCode',
-    name: 'update',
-    component: Update
-  },
-  {
-    path: '/EnterResults',
-    component: EnterResults
-  },
 
   {
     path: '/create',
@@ -111,11 +73,39 @@ const routes = [
     component: ShareLinks
   },
   {
-    path: '/result',
-    component: FinalResult
+    path: '/:eventCode/edit/:hostCode',
+    name: 'edit',
+    component: Edit
+  },
+
+  {
+    path: '/choose/:eventCode',
+    name: 'choose',
+    component: Choose
   },
   {
-    path: '/result/final',
+    path: '/:eventCode/thanks/:idCode',
+    name: 'Success',
+    component: ChooseSuccess
+  },
+
+  {
+    path: '/EnterResults',
+    component: EnterResults
+  },
+  {
+    path: '/:eventCode/result/:hostCode',
+    name: 'result',
+    component: Result
+  },
+  {
+    path: '/:eventCode/copylink',
+    name: 'copylink',
+    component: CopyLink
+  },
+  {
+    path: '/:eventCode/final/:hostCode',
+    name: 'finalresult',
     component: FinalResult
   }
 

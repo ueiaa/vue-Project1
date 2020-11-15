@@ -1,5 +1,6 @@
 <template>
  <div id="box">
+   <page-tab-bar></page-tab-bar>
    <div class="base">
     
 
@@ -30,12 +31,15 @@
  </div>
 </template>
 <script>
-
+import PageTabBar from '@/components/content/tabbar/PageTabBar'
 export default {
-    name: 'CopyLinkCpn',
+    name: 'CopyLink',
+    components: {
+        PageTabBar
+    },
     data(){
         return{
-          eventChoose: 'http://localhost:8080/' + this.$route.params.eventCode,
+          eventChoose: 'http://localhost:8080/choose/' + this.$route.params.eventCode,
         }
     },
     mounted(){
@@ -43,10 +47,15 @@ export default {
     },
     methods: {
       onCopy: function (e) {
-        alert('成功复制: ' + e.text)
+        //alert('成功复制: ' + e.text)
+        this.$message({
+                message: '复制成功',
+                type: 'success'
+        });
       },
       onError: function (e) {
-        alert('复制失败')
+        //alert('复制失败')
+        this.$message.error('复制失败');
       },
 
       link(){

@@ -1,5 +1,6 @@
 <template>
   <div id="box" v-if="box">
+    <page-tab-bar></page-tab-bar>
     <div class="base">
 
     <!-- 事件名称与描述 -->    
@@ -13,7 +14,7 @@
         </div>
 
         <div class="eventDuration">
-            <p><span>持续时间：{{ eventDuration }}小时</span></p>
+            <p><span>持续时间：{{ eventDuration }}</span></p>
         </div>
     </div>
 
@@ -39,7 +40,8 @@
     </div>
 
     <!-- 日历区 -->
-    <Calendar @getTimeUnit='getTimeUnit' 
+    <Calendar class="demo-app"
+              @getTimeUnit='getTimeUnit' 
               @getTimeUnitId='getTimeUnitId'
               :Datas='datasToCalendar'/>
     <button @click="changeCalendarFormat">try</button>>
@@ -78,11 +80,13 @@
 </template>
 
 <script>
-import Calendar from "./FullCalendar"
+import PageTabBar from '@/components/content/tabbar/PageTabBar'
+import Calendar from "@/components/content/calendar"
 import { createTimeUnitId,timeUnitIdToTime,timeUnitSpilt } from '@/utils/calendar-utils'
 export default {
-  name: 'EventChoose',
+  name: 'Choose',
   components: {
+    PageTabBar,
     Calendar
   },
 
@@ -149,17 +153,17 @@ export default {
           // 背景时间：用于显示发起者未选择的时间
           // 一开始是空，根据后端返回的数据进行初始化
           events: [
-            {
+            /* {
               // 传入的数据应该是发起者未选择的时间
-              groupId: "hostChoose",
-              id: '2020-11-02-10:00:00-1',
-              start: '2020-11-02T10:00:00',
+              /* groupId: "hostSelect",
+              id: '2020-11-11-10:00:00-1',
+              start: '2020-11-10T10:00:00',
               // end: '2020-11-01T16:00:00',
               // display: 'background',
               // backgroundColor: 'red'
-              backgroundColor: '#FF6633',
-              title: '1'
-            }
+              //backgroundColor: '#FF6633',
+              title: '1' 
+            } */
           ],
           pages: 'select',   // 这里有三个选项：create、select、result 对应3个页面
         }
@@ -171,23 +175,7 @@ export default {
   },
 
   mounted () {
-        /* this.$api{
-           if(res.data.code === 200){
-               this.eventName = res.data.eventName;
-           } 
-        } */
-      /* this.$api.eventinfo.getEventInfo(this.$route.params.eventCode,
-        {
-          hostCode: this.$route.params.eventCode
-        }
-      ).then(res => {
-        console.log(res.data)
-        if(res.data.code === 200){
-          this.eventName = res.data.eventName;
-          this.eventInfo = res.data.eventDescription;
-          this.eventDuration = res.data.eventDuration;
-        }
-      }) */
+        
   },
 
   created () {
@@ -198,21 +186,8 @@ export default {
     initData(){
       let formatapi = this.datasToCalendar.calendarFormat;  
       let eventapi = this.datasToCalendar.calendarFunction;
-      
-          // 已经选择时间，对传给后端的数据进行处理
-                        /* let showDay = '';
-                        if(formatapi.hiddenDays.length > 0) {
-                            showDay = formatapi.hiddenDays[0];
-                            for (let index = 1; index < formatapi.hiddenDays.length; index++) {
-                                showDay += ',' + formatapi.hiddenDays[index];
-                            }
-                        } */
-            
-            
-            let eventsId = eventapi.events[0].id;
-            let eventsBack = eventapi.events[0].backgroundColor;
-            
-          
+    
+    //调用日历渲染接口
     this.$api.event.getResultByCode(this.$route.params.eventCode,
         {
           eventCode: this.$route.params.eventCode
@@ -224,15 +199,25 @@ export default {
           this.eventName = res.data.data.eventName;
           this.eventInfo = res.data.data.eventDescription;
           this.eventDuration = res.data.data.eventDuration;
+          
+          //将传回的数据调整成日历所需格式
           let time = res.data.data.timeUnit;
 
           let timeStr = time.split(",");
-          for (let index = 1; index < timeStr.length; index++) {
-              eventsId += timeStr[index].timeUnitIdToTime;
-              eventsBack = "#FF6633";
+
+          //日历中显示发起者所选的时间
+          for (let index = 0; index < timeStr.length; index++) {
+              var nowEvent = {}
+              nowEvent.id = timeStr[index];
+              nowEvent.start = timeUnitIdToTime(timeStr[index]);
+              nowEvent.groupId = 'hostSelect';
+              eventapi.events.push(nowEvent);
           }
+          //console.log(eventapi.events)
         }
-      })
+      }).catch(error => {
+              console.log(error);
+      });
       this.box = true;
   },
 
@@ -240,15 +225,15 @@ export default {
     itemClick(info_content) {
       this.$refs[info_content].validate((valid) => {
         if(valid){
-        this.$router.push({ name: 'cSuccess', params: { eventCode: 'ipia2cn',idCode: 'pgadf27a' }});
+        this.$router.push({ name: 'Success', params: { eventCode: 'ipia2cn',idCode: 'pgadf27a' }});
         }else{
           alert('请填写您的姓名')
         }
       })
     },
 
+    //将数据传给后端
     choose(info_content) {
-      
       this.$refs[info_content].validate((valid) => {
         if (valid) {
           let formatapi = this.datasToCalendar.calendarFormat;  
@@ -256,22 +241,22 @@ export default {
           // 判断是否已经选择时间
           if(eventapi.events.length > 0) {
           // 已经选择时间，对传给后端的数据进行处理
-                        /* let showDay = '';
-                        if(formatapi.hiddenDays.length > 0) {
-                            showDay = formatapi.hiddenDays[0];
-                            for (let index = 1; index < formatapi.hiddenDays.length; index++) {
-                                showDay += ',' + formatapi.hiddenDays[index];
-                            }
-                        } */
-            
-            if(eventapi.events.groupId === 'inviteeSelect'){
-              let idTo = eventapi.events.id;
-            };
-            let eventsId = eventapi.events[0].id;
-            for (let index = 1; index < eventapi.events.length; index++) {
-              eventsId += ',' + eventapi.events[index].id;
+          var idTo;
+            if(eventapi.events[0].groupId === 'inviteeSelect'){
+              idTo = eventapi.events[0].id;
+            }else{
+              idTo = ''; //传数据时第一个值会是一个未选择的值，所以赋值为空，未解决
             }
-          }
+            
+            for (let index = 0; index < eventapi.events.length; index++) {
+              
+              if(eventapi.events[index].groupId === 'inviteeSelect'){
+                idTo += ',' + eventapi.events[index].id;
+              };
+              /* eventsId += ',' + eventapi.events[index].id; */
+            }
+            
+            //调用接口传数据
             this.$api.event.attendEvent(this.$route.params.eventCode,{
               
                 eventCode: this.$route.params.eventCode,
@@ -282,20 +267,27 @@ export default {
             }).then(res => {
               //console.log(res.data)
               if (res.data.code == 200) {
-               
-                this.$router.push({ name: 'cSuccess', params: { eventCode: this.$route.params.eventCode,idCode: res.data.data.idCode }});
+                console.log(idTo)
+                this.$router.push({ name: 'Success', params: { eventCode: this.$route.params.eventCode,idCode: res.data.data }});
               }else{
                 alert('请求失败')
               }
             }).catch(error => {
               console.log(error);
             });
+          }else {
+            // 没有选择时间 弹出提示
+            this.$alert('没有选择时间！', '提示', {
+            confirmButtonText: '确定',
+                 
+          });
+        }
             
         }else {
           console.log("error submit!!");
           return false;
         }
-      
+        
       });
     },
        
@@ -455,6 +447,17 @@ export default {
   border-width: 1px;
   background-color: #ffffff;
   border-radius: 5px;
+}
+
+.demo-app {
+  position: absolute;
+  top: 220px;
+  left: 110px;
+  display: flex;
+  width: 1000px;
+  min-height: 100%;
+  font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: 14px;
 }
 
 .info{

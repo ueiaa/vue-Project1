@@ -12,7 +12,7 @@
                   <span>你将无法查看事件的结果</span>
                 </div>
                 <div class="code-card-code">
-                  <span>{{ eventCode }}</span>
+                  <span>{{ hostCode }}</span>
                   <el-button class="copy-btn"
                         v-clipboard:copy="eventCode"
                         v-clipboard:success="onCopy"
@@ -43,7 +43,7 @@
                     <span>发送该链接给你的被邀请人：</span>
                   </div>
                   <div class="links-card-links">
-                    <span class="url" @click="shareLink()">http://localhost:8080/{{ eventCode }}</span>
+                    <span class="url" @click="share()">{{ shareLink }}</span>
                     <br>
                   <!--   <a href="" >{{ shareLink }}</a> -->
                     <el-button class="copy-btn"
@@ -68,7 +68,7 @@
                     <span>查看事件结果链接：</span>
                   </div>
                   <div class="links-card-links">
-                    <span class="url" @click="resultLink()">http://localhost:8080/{{ eventCode }}/result/{{ hostCode }}</span>
+                    <span class="url" @click="result()">{{ resultLink }}</span>
                     <br>
                     <!-- <a href="">{{ resultLink }}</a> -->
                     <el-button class="copy-btn"
@@ -82,11 +82,11 @@
                     <span>重新编辑事件链接：</span>
                   </div>
                   <div class="links-card-links">
-                    <span class="url" @click="reeditLink()">http://localhost:8080/{{ eventCode }}/edit/{{ hostCode }}</span>
+                    <span class="url" @click="edit()">{{ editLink }}</span>
                     <br>
                     <!-- <a href="">{{ reeditLink }}</a> -->
                     <el-button class="copy-btn"
-                        v-clipboard:copy="reeditLink"
+                        v-clipboard:copy="editLink"
                         v-clipboard:success="onCopy"
                         v-clipboard:error="onError">复制</el-button>
                   </div>
@@ -114,9 +114,9 @@ export default {
             reminderChecked: false,
             eventCode: this.$route.params.eventCode,
             hostCode: this.$route.params.hostCode,
-            /* shareLink: 'http://localhost:8080/' + this.$route.params.eventCode,
-            resultLink: '',
-            reeditLink: '', */
+            shareLink: 'http://localhost:8080/choose/' + this.$route.params.eventCode,
+            resultLink: 'http://localhost:8080/' + this.$route.params.eventCode + '/result/' + this.$route.params.hostCode,
+            editLink: 'http://localhost:8080/' + this.$route.params.eventCode + '/edit/' + this.$route.params.hostCode,
             codePhoneForm: {
                 codePhone: ''
             },
@@ -149,14 +149,14 @@ export default {
             this.$message.error('复制失败');
         },
 
-        shareLink(){
+        share(){
             this.$router.push({ name: 'choose', params: { eventCode: this.$route.params.eventCode}});
         },
-        resultLink(){
+        result(){
             this.$router.push({ name: 'result', params: { eventCode: this.$route.params.eventCode, hostCode: this.$route.params.hostCode}});
         },
-        reeditlink(){
-            this.$router.push({ name: 'choose', params: { eventCode: this.$route.params.eventCode, hostCode: this.$route.params.hostCode}});
+        edit(){
+            this.$router.push({ name: 'edit', params: { eventCode: this.$route.params.eventCode, hostCode: this.$route.params.hostCode}});
         },
     },
     mounted() {
@@ -239,12 +239,7 @@ export default {
 .links-card-links {
     text-align: center;
 }
-.links-card-links a {
-    display: block;
-    margin-top: 30px;
-    text-decoration: none;
-    color: #409EFF;
-}
+
 .reminder-phone-form {
     /* text-align: center; */
     width: 400px;
@@ -261,8 +256,12 @@ export default {
 }
 
 .url{
-  margin-top: 20px;
+  
   color: #69c0ff;
   cursor: pointer;
+  display: block;
+    margin-top: 30px;
+    text-decoration: none;
+   
 }
 </style>
