@@ -47,15 +47,10 @@ export default {
     },
     methods: {
       onCopy: function (e) {
-        //alert('成功复制: ' + e.text)
-        this.$message({
-                message: '复制成功',
-                type: 'success'
-        });
+        alert('成功复制: ' + e.text)
       },
       onError: function (e) {
-        //alert('复制失败')
-        this.$message.error('复制失败');
+        alert('复制失败')
       },
 
       link(){
@@ -64,6 +59,7 @@ export default {
     }
 }
 </script>
+
 <style scoped>
 #box{
     width: 100%;

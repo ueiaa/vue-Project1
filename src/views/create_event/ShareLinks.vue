@@ -14,7 +14,7 @@
                 <div class="code-card-code">
                   <span>{{ hostCode }}</span>
                   <el-button class="copy-btn"
-                        v-clipboard:copy="eventCode"
+                        v-clipboard:copy="hostCode"
                         v-clipboard:success="onCopy"
                         v-clipboard:error="onError">复制</el-button>
                 </div>
@@ -158,18 +158,11 @@ export default {
         edit(){
             this.$router.push({ name: 'edit', params: { eventCode: this.$route.params.eventCode, hostCode: this.$route.params.hostCode}});
         },
-    },
-    mounted() {
-      /* this.eventCode = localStorage.getItem('eventCode');
-      this.hostCode = localStorage.getItem('hostCode');
-      this.shareLink = 'http://localhost:8080/'+ this.$route.params.eventCode;
-      this.resultLink = 'http://localhost:8080/' + this.$route.params.eventCode + '/results/' + this.$route.params.hostCode;
-      this.reeditLink = 'http://localhost:8080/' + this.$route.params.eventCode + '/edit/' + this.$route.params.hostCode; */
     }
 }
 </script>
 
-<style scope>
+<style scoped>
 .card-wrapper {
     padding-top: 150px;
     width: 100%;

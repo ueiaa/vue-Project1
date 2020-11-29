@@ -138,7 +138,7 @@ export default {
       if (this.pages === 'create') {
         clickInfo.event.remove();
         this.$emit('getTimeUnit',this.selectTime);
-      }else if(this.pages === 'select'){
+      }else if(this.pages === 'select' || this.pages === 'update'){
         // 如果是填写事件页面
         // 先判断当前时间是 inviteeSelect 或者 hostSelect
         if(clickInfo.event.groupId === 'hostSelect'){
@@ -159,8 +159,8 @@ export default {
             id: clickInfo.event.id,
             start: clickInfo.event.start,
             groupId: 'hostSelect',
-            backgroundColor: '#3788d8',
-            borderColor: '#3788d8',
+            //backgroundColor: '#3788d8',
+            //borderColor: '#3788d8',
             //title: '1'
           })
           // 更新父组件中的时间块

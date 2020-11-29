@@ -12,8 +12,7 @@ import verifycode from '@/api/verifycode';
 //2
 
 
-//参与者选择时间
-import eventcode from '@/api/eventcode';
+
 
 
 import event from '@/api/event';
@@ -24,6 +23,5 @@ export default {
     login,
     userinfo,
     verifycode,
-    eventcode,
     event
 }

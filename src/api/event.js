@@ -34,9 +34,15 @@ const event = {
             params: params
         });
     },
+    // 重新选择时间获取上一次的信息
+    getPartnerInfo(idCode,params) {
+        return axios.get(base.baseUrl + `/eventinfo/partner/${idCode}`, {
+            params: params
+        });
+    },
     // 重新选择时间
-    updateTimeSelected(params) {
-        return axios.post(base.baseUrl + `${eventCode}/update/${idCode}`, null, {
+    updateTimeSelected(eventCode,idCode,params) {
+        return axios.post(base.baseUrl + `/${eventCode}/update/${idCode}`, null, {
             params: params
         });
     },
@@ -68,16 +74,27 @@ const event = {
             params: params
         });
     },
+    getTimeDetail(eventCode,hostCode,params) {
+        return axios.post(base.baseUrl + `/${eventCode}/result/${hostCode}`, null, {
+            params: params
+        });
+    },
+    //删除回应
+    deletePartnerResponse(eventCode,hostCode,params) {
+        return axios.post(base.baseUrl + `/${eventCode}/result/${hostCode}/delete`, null, {
+            params: params
+        });
+    },
 
     /**
      *  最终结果页面相关
      */
     // 获取最终结果
-    getFinalResult(eventCode,hostCode,params) {
-        return axios.post(base.baseUrl + `/${eventCode}/result/${hostCode}`, null, {
+    getFinalResult(eventCode,params) {
+        return axios.get(base.baseUrl + `/${eventCode}/final`, {
             params: params
         });
-    }   
+    }
 }
 
 export default event;
