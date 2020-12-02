@@ -281,6 +281,7 @@ export default {
       kjIsShow: true, //可见图标
       bkjIsShow: false, //不可见图标
       selectedResponse: '',
+      titleStr: [],
 
       /* 日历相关 */
       /***************************
@@ -548,6 +549,14 @@ export default {
                 this.responseList.push(invitee);
               }
               //console.log(this.responseList);
+
+              //存储所有单元格的title，点击时标记时使用
+              for(let i = 0; i<eventapi.events.length; i++){
+                var num = {}
+                num.id = eventapi.events[i].id;
+                num.title = eventapi.events[i].title;
+                this.titleStr.push(num);
+              }
                
               this.allElectionFun();
               this.DefaultFullSelection();
@@ -741,13 +750,27 @@ export default {
           }
         }
         
-        //添加点击时遮罩
-        /* for(let i = 0; i<eventapi.events.length; i++){
-          if(eventapi.events[i].id === eventapi.idOfSelectTime){
-            eventapi.events[i].backgroundColor = '#333333';
-          }
+        
+        //添加点击时标记
+        for(let i = 0; i<eventapi.events.length; i++){
+            if(eventapi.events[i].title === '✔'){
+              for(let k = 0; k<this.titleStr.length; k++){
+                if(eventapi.events[i].id === this.titleStr[k].id){
+                  eventapi.events[i].title = this.titleStr[k].title;
+                }
+              }
+              console.log(eventapi.events[i].title);
+            }
+            if(eventapi.events[i].id === eventapi.idOfSelectTime){
+            //eventapi.events[i].backgroundColor = '#333333';
+              eventapi.events[i].title = '✔';
+            }
+
+
         }
-        console.log(eventapi.idOfSelectTime); */
+        //console.log(str);
+        
+        //console.log(eventapi.idOfSelectTime);
       },
 
       // 动态调整日历的格式：实现的时候与表单进行绑定（第三期任务）
@@ -790,6 +813,9 @@ export default {
 
 /* .fc-event-main :hover{
   border: 2px solid #333333;
+} */
+/* .fc-timegrid-event-harness >>> a :active{
+  border-color: #333333;
 } */
 
 .title{
