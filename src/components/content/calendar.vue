@@ -4,6 +4,7 @@
       <FullCalendar
         class='demo-app-calendar'
         :options='calendarOptions'
+        ref="fullCalendar"
       >
         <template v-slot:eventContent='arg'>
           <b>{{ arg.timeText }}</b>
@@ -76,8 +77,7 @@ export default {
         contentHeight: "auto",
         // 不允许用户选择已经选择过的时间点
         selectOverlap: false,
-        // 是否显示周末
-        weekends: true,
+        
         /***************************
         *     用户可调整的属性
         *  与调整日历格式相关功能有关
@@ -141,6 +141,7 @@ export default {
       }else if(this.pages === 'select' || this.pages === 'update'){
         // 如果是填写事件页面
         // 先判断当前时间是 inviteeSelect 或者 hostSelect
+        
         if(clickInfo.event.groupId === 'hostSelect'){
           clickInfo.event.remove();
           clickInfo.view.calendar.addEvent({
@@ -153,19 +154,32 @@ export default {
           }),
           // 更新父组件中的时间块
           this.$emit('getTimeUnit',this.selectTime);
-        }else{
+        }else if(clickInfo.event.groupId === 'inviteeSelect'){
           clickInfo.event.remove();
           clickInfo.view.calendar.addEvent({
             id: clickInfo.event.id,
             start: clickInfo.event.start,
             groupId: 'hostSelect',
-            //backgroundColor: '#3788d8',
-            //borderColor: '#3788d8',
+            backgroundColor: '#3788d8',
+            borderColor: '#3788d8',
+            //title: '1'
+          })
+          // 更新父组件中的时间块
+          this.$emit('getTimeUnit',this.selectTime);
+        }else{
+          clickInfo.event.remove();
+          clickInfo.view.calendar.addEvent({
+            id: clickInfo.event.id,
+            start: clickInfo.event.start,
+            groupId: 'inviteeSelect',
+            backgroundColor: '#003399',
+            borderColor: '#003399',
             //title: '1'
           })
           // 更新父组件中的时间块
           this.$emit('getTimeUnit',this.selectTime);
         }
+
       }else if(this.pages === 'result' ){
         // 若是结果页面，返回点击时间的id，根据id查找数据，渲染
         this.$emit('getTimeUnitId', clickInfo.event.id);
@@ -189,25 +203,18 @@ export default {
       return { domNodes: arrayOfDomNodes };
     }
   },
+  mounted() {
+    if(this.pages === 'create'){
+      let calendarApi = this.$refs.fullCalendar.getApi()
+      this.$emit('getTodayDate', calendarApi.getDate());
+      calendarApi.next()
+      calendarApi.prev()
+    }
+  }
 }
 </script>
 
-<style lang='css'>
-h2 {
-  margin: 0;
-  font-size: 16px;
-}
-ul {
-  margin: 0;
-  padding: 0 0 0 1.5em;
-}
-li {
-  margin: 1.5em 0;
-  padding: 0;
-}
-b { /* used for event dates/times */
-  margin-right: 3px;
-}
+<style>
 .demo-app {
   display: flex;
   min-height: 100%;
@@ -242,5 +249,8 @@ b { /* used for event dates/times */
 }
 .fc-icon {
     font-weight: bold!important;
+}
+.fc-day-disabled {
+  background-color: rgba(100,100,100,0.3)!important;
 }
 </style>

@@ -22,17 +22,39 @@
             <div class="item" >
                 <p type="text" @click="copyLink()">邀请更多人</p>
                 <p @click="eventChoose()">增加回应</p>
-                <p @click="itemClick('/create')">编辑事件</p>
+                <p @click="edit()">编辑事件</p>
+                <p @click="drawer = true;openDrawer()">查看留言</p>
             </div>
         </el-card>
+
+        <el-drawer
+              title="选定回应者的留言"
+              :visible.sync="drawer"
+              :direction="direction"
+              >
+              <el-scrollbar style="height: 100%">
+                <div class="commentList">
+                  <div class="comment" 
+                        v-for="(item,i) in commentList"
+                        :key="i" 
+                        :label="item.name">
+                    {{item.name}}：{{ item.comment }}
+
+                  </div>
+                </div>
+              </el-scrollbar>
+            </el-drawer>
      </div>
+
+     
 
      <!-- 左下侧栏 -->
      <div class="left_wrapper2">
        
         <el-card class="box-card2" shadow="hover">
             <div slot="header" class="clearfix">
-                <span>回应列表</span>               
+                <span>回应列表</span> 
+                     
             </div>
  
             <el-scrollbar style="height: 100%">
@@ -41,24 +63,26 @@
                <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">
                 全选
                </el-checkbox>
-               <i class="icon iconfont iconkejian" v-show="kjIsShow" @click="changeBtn"></i>
-               <i class="icon iconfont iconbukejian" v-show="bkjIsShow" @click="changeBtn2"></i>
+               <!-- <i class="icon iconfont iconkejian" @click="drawer = true;openDrawer()"></i> -->
+               <!-- <i class="icon iconfont iconbukejian" v-show="bkjIsShow" @click="changeBtn2"></i> -->
                <span @click="dialogTableVisible3 = true"><i class="icon iconfont iconyoujian" ></i></span>
                <span @click="deleteResponse()"><i class="icon iconfont iconshanchu"></i></span>
                <div class="line"></div>
                </div>
                
               <el-checkbox-group v-model="checkedPeople" @change="handleCheckedChange">
+                <div v-for="(item,i) in responseList" @mouseenter="show(i);" @mouseleave="leave()">
                 <el-checkbox
                   class="checkedPeople" 
-                  v-for="(item,i) in responseList"
+                  
+                  
                   :key="i"
                   :label="item.name"
                   
                  
                  >{{item.name}} 
                  </el-checkbox>
-                
+                </div>
               </el-checkbox-group>
              </div>
              
@@ -67,22 +91,22 @@
         </el-card>
 
         <!-- 发送重新选择提醒到指定参与者的邮箱 -->
-        <el-dialog title="发送邮件" :visible.sync="dialogTableVisible3" :append-to-body="true">
+        <el-dialog title="发送重新选择提醒到指定参与者的邮箱" :visible.sync="dialogTableVisible3" :append-to-body="true">
 
           <el-form ref="sendEmailForm"  :model="sendEmailForm">
-            <el-form-item label="活动名称">
+            <el-form-item label="邮箱地址（以,隔开）">
               <el-input v-model="sendEmailForm.email.value" autocomplete="off"></el-input>
             </el-form-item>
             
-            <el-form-item>
-              <el-button type="primary" @click="sendrequest()" style="font-size:30px;">
+           <!--  <el-form-item>
+              <el-button type="primary" class="send" @click="sendrequest('sendEmailForm')" style="font-size:30px;">
                 发送
               </el-button>
-            </el-form-item>
+            </el-form-item> -->
           </el-form>
 
           <span slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="dialogTableVisible3 = false">确 定</el-button>
+            <el-button type="primary" @click="dialogTableVisible3 = false;sendrequest('sendEmailForm')">发 送</el-button>
             <el-button  @click="dialogTableVisible3 = false">取 消</el-button>
           </span>
         </el-dialog>
@@ -118,7 +142,6 @@
               @getTimeUnit='getTimeUnit' 
               @getTimeUnitId='getTimeUnitId'
               :Datas='datasToCalendar'/>
-    <button @click="changeCalendarFormat">try</button>
 
      <!-- 右侧栏 -->
      <div class="right_wrapper">
@@ -167,7 +190,7 @@
      </div>
 
      <!-- 下侧留言栏 -->
-     <div class="bottom_wrapper">
+     <!-- <div class="bottom_wrapper">
        <el-card class="box-card_bottom" shadow="hover">
          <div slot="header" class="clearfix">
                 <span>他们的留言</span>
@@ -186,7 +209,7 @@
          </el-scrollbar>
 
        </el-card>
-     </div>
+     </div> -->
 
    </div>
  </div>
@@ -228,6 +251,12 @@ export default {
           }],  
       },
 
+      drawer: false,
+      direction: 'ltr',
+
+      hostTime: '',//存储接口回传的hostTimeUnit
+      preferTime: '', //存储接口回传的preferTimeUnit
+      finalTime: '', //存储接口回传的finalTimeUnit
       timeBlock: '', //存储接口回传的timeDetail
       partners: '', //存储接口回传的partners
             
@@ -237,27 +266,6 @@ export default {
                 name: 'vv'
               },{
                 id:'1',
-                name: 'aa'
-              },{
-                id:'2',
-                name: 'aa'
-              },{
-                id:'3',
-                name: 'aa'
-              },{
-                id:'4',
-                name: 'aa'
-              },{
-                id:'5',
-                name: 'aa'
-              },{
-                id:'6',
-                name: 'aa'
-              },{
-                id:'7',
-                name: 'aa'
-              },{
-                id:'8',
                 name: 'aa'
               } */
       ],
@@ -272,6 +280,7 @@ export default {
             
       kjIsShow: true, //可见图标
       bkjIsShow: false, //不可见图标
+      selectedResponse: '',
 
       /* 日历相关 */
       /***************************
@@ -360,6 +369,33 @@ export default {
         this.$router.push({ name: 'sendrequest', params: { eventCode: this.$route.params.eventCode}});
       },
 
+      edit(){
+        this.$router.push({ name: 'edit', params: { eventCode: this.$route.params.eventCode, hostCode: this.$route.params.hostCode}});
+      },
+
+      //发送提醒邮件
+      sendrequest(sendEmailForm){
+
+      },
+
+      //打开留言板
+      openDrawer(){
+        //先将上一次渲染的数据清空
+        this.commentList = [];
+        //渲染留言列表
+        for(var l = 0; l<this.partners.length; l++){
+          for (let index2 = 0; index2 < this.selectionArr.length; index2++){
+            if(this.partners[l].name === this.selectionArr[index2].name){
+              var commentArr = {}
+              commentArr.name = this.partners[l].name;
+              commentArr.comment = this.partners[l].comment;
+              this.commentList.push(commentArr);
+            }
+          }
+        }
+      },
+
+      // 确定最终时间
       finalResult(){
         this.$api.event.selectFinalTime(this.$route.params.eventCode,this.$route.params.hostCode,
             {
@@ -383,11 +419,11 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          var selectedResponse = this.selectionArr[0].idCode;
+          this.selectedResponse = this.selectionArr[0].idCode;
           for (let index = 0; index < this.responseList.length; index++) {
             for (let index2 = 1; index2 < this.selectionArr.length; index2++){
               if(this.responseList[index].name === this.selectionArr[index2].name){
-                selectedResponse += ","+this.selectionArr[index2].idCode;
+                this.selectedResponse += ","+this.selectionArr[index2].idCode;
               };
             }
           }
@@ -395,7 +431,7 @@ export default {
             {
               eventCode: this.$route.params.eventCode,
               hostCode: this.$route.params.hostCode,
-              idCodeList: selectedResponse,
+              idCodeList: this.selectedResponse,
             }).then(res => {
               console.log(res.data)
               if(res.data.code === 200){
@@ -441,11 +477,18 @@ export default {
               formatapi.slotMaxTime = showHours[1] + ":00"
               let highlightHours = res.data.data.calendar.highlightHours.split(",")
               formatapi.businessHours = {
-                daysOfWeek: [ 1, 2, 3, 5, 6, 0],
+                //daysOfWeek: [ 1, 2, 3, 5, 6, 0],
                 startTime: highlightHours[0],
                 endTime: highlightHours[1], 
               }
-              formatapi.hiddenDays = [],
+              let hiddenDay = res.data.data.calendar.hiddenDays.split(",")
+              formatapi.hiddenDays = []
+              for(var i = 0; i<hiddenDay.length; i++){
+                if(typeof(hiddenDay[i]) == "number" ){
+                  formatapi.hiddenDays.push(Number(hiddenDay[i]));
+                }
+              }
+              //console.log(formatapi.hiddenDays);
               formatapi.validRange = {
                 start: res.data.data.calendar.startTime,
                 end: res.data.data.calendar.endTime
@@ -469,9 +512,9 @@ export default {
             console.log(res.data)
             if(res.data.code === 200){
                          
-              let hostTime = res.data.data.hostTimeUnit;
-              let preferTime = res.data.data.preferTimeUnit;
-              let finalTime = res.data.data.finalTimeUnit;
+              this.hostTime = res.data.data.hostTimeUnit;
+              this.preferTime = res.data.data.preferTimeUnit;
+              this.finalTime = res.data.data.finalTimeUnit;
               this.timeBlock = res.data.data.timeDetail;
               this.partners = res.data.data.partners;
               
@@ -481,63 +524,33 @@ export default {
                  }
                  console.log(tmp);
                  console.log(typeof(tmp)); */
-                for (let index = 0; index < hostTime.length; index++) {
-                  var nowEvent = {}
-                  nowEvent.id = hostTime[index];
-                  nowEvent.start = timeUnitIdToTime(hostTime[index]);
-                  nowEvent.groupId = 'hostSelect';
-                  for(var k in this.timeBlock){
-                    if(this.timeBlock[k].timeUnit == hostTime[index]){
-                      nowEvent.title = this.timeBlock[k].absentNum;
-                    }
-                  }
-                  eventapi.events.push(nowEvent);
-                }
-                  //调用封装的方法，数组获取不到最后一个值
-                  //this.addBlueBlock(hostTime,preferTime,timeDetail);
-                if(preferTime.length >= 1){
-                  this.addOrangeBlock(preferTime);
-                }
-                if(finalTime){
-                  this.addFinalTimeBlock(finalTime);
-                }
-                    
-                    //将普通时间块移除，新建推荐时间块，有问题
-                    /* for(let i = 0; i<eventapi.events.length; i++){
-                      for(let j = 0; j<preferTime.length; j++){
-                        
-                        if(eventapi.events[i].id == preferTime[j]){
-                          
-                          eventapi.events.splice(i,1);
-                          
-                          var preferEvent = {}
-                          preferEvent.id = preferTime[j];
-                          preferEvent.start = timeUnitIdToTime(preferTime[j]);
-                          preferEvent.groupId = 'hostSelect';
-                          preferEvent.backgroundColor = '#FAAD14';
-                          preferEvent.borderColor = '#FAAD14';
-                          eventapi.events.push(preferEvent);
-                        }
-                      }
-                    } */
-                //渲染回应列表
-                for(var l = 0; l<this.partners.length; l++){
-                  var invitee = {}
-                  invitee.name = this.partners[l].name;
-                  invitee.idCode = this.partners[l].idCode;
-                  this.responseList.push(invitee);
-                }
-                  //console.log(this.responseList);
-                
-                //渲染留言列表
-                for(var l = 0; l<this.partners.length; l++){
-                  var commentArr = {}
-                  commentArr.name = this.partners[l].name;
-                  commentArr.comment = this.partners[l].comment;
-                  this.commentList.push(commentArr);
-                }
-                 this.allElectionFun();
-                 this.DefaultFullSelection();
+              
+              //创建普通时间块
+              if(this.hostTime.length >= 1){
+                this.addBlueBlock(this.hostTime,this.timeBlock);
+              }
+
+              //创建推荐时间块
+              if(this.preferTime.length >= 1){
+                this.addOrangeBlock(this.preferTime);
+              }
+
+              //创建最终时间块
+              if(this.finalTime){
+                this.addFinalTimeBlock(this.finalTime);
+              }
+
+              //渲染回应列表
+              for(var l = 0; l<this.partners.length; l++){
+                var invitee = {}
+                invitee.name = this.partners[l].name;
+                invitee.idCode = this.partners[l].idCode;
+                this.responseList.push(invitee);
+              }
+              //console.log(this.responseList);
+               
+              this.allElectionFun();
+              this.DefaultFullSelection();
             }
           }).catch(error => {
                 console.log(error);
@@ -545,8 +558,26 @@ export default {
           this.box = true;
       },
 
+      //创建参与者选择的时间块
+      addInviteeBlock(i,partners,responseList) {
+        let eventapi = this.datasToCalendar.calendarFunction;
+        for(var l = 0; l<partners.length; l++){
+          if(this.partners[l].name === responseList[i].name){
+            for (let index = 0; index < partners[l].timeUnit.length; index++) {
+              var oneEvent = {}
+              oneEvent.id = partners[l].timeUnit[index];
+              oneEvent.start = timeUnitIdToTime(partners[l].timeUnit[index]);
+              oneEvent.groupId = 'one';
+              oneEvent.backgroundColor = '#95de64';
+              oneEvent.borderColor = '#95de64'
+              eventapi.events.push(oneEvent);
+            }
+          }
+        }
+      },
+
       //创建普通时间块
-      /* addBlueBlock(preferTime,hostTime,timeDetail) {
+      addBlueBlock(hostTime,timeDetail) {
         let eventapi = this.datasToCalendar.calendarFunction;
         for (let index = 0; index < hostTime.length; index++) {
           var nowEvent = {}
@@ -562,7 +593,7 @@ export default {
           eventapi.events.push(nowEvent);
         }
         //console.log(hostTime.length);
-      }, */
+      },
 
       //创建推荐时间块
       addOrangeBlock(preferTime){
@@ -590,6 +621,51 @@ export default {
             }
         }
       },
+      
+      //鼠标移入对应回应者，显示该回应者的选择
+      show(i){ 
+        let eventapi = this.datasToCalendar.calendarFunction;
+
+        //将原有时间块移除
+        if(eventapi.events.length > 0){
+          for(var index = 0;index<eventapi.events.length;index++){
+            eventapi.events.splice(index,1);
+            index--;
+          }
+        }
+
+        //创建参与者选择的时间块（传入鼠标移入对应的i）
+        this.addInviteeBlock(i,this.partners,this.responseList);
+        //console.log(this.responseList[i].name);
+      },  
+
+      //鼠标移出，显示原有时间块
+      leave(){
+        let eventapi = this.datasToCalendar.calendarFunction;
+
+        //将原有时间块移除
+        if(eventapi.events.length > 0){
+          for(var index = 0;index<eventapi.events.length;index++){
+            eventapi.events.splice(index,1);
+            index--;
+          }
+        }
+
+        //创建普通时间块
+        if(this.hostTime.length >= 1){
+          this.addBlueBlock(this.hostTime,this.timeBlock);
+        }
+
+        //创建推荐时间块
+        if(this.preferTime.length >= 1){
+          this.addOrangeBlock(this.preferTime);
+        }
+        
+        //创建最终时间块
+        if(this.finalTime){
+          this.addFinalTimeBlock(this.finalTime);
+        }
+      },
 
       //获取需要默认显示的数据
       allElectionFun() { 
@@ -599,8 +675,8 @@ export default {
            }
       },
 
+      // 初始化 默认全部选中
       DefaultFullSelection() {
-        // 初始化 默认全部选中
         this.checkedPeople = this.allElection;
         let checkedCount = this.checkedPeople.length;
         this.checkAll = checkedCount === this.responseList.length;
@@ -608,7 +684,8 @@ export default {
         this.selectionFun(this.checkedPeople);
       },
 
-      selectionFun(selectionArr) { // 获取选中的对象
+      // 获取选中的对象
+      selectionFun(selectionArr) { 
                 this.selectionArr = [];
                 for (var i = 0; i < this.responseList.length; i++) {
                   for (var j = 0; j < selectionArr.length; j++) {
@@ -619,46 +696,24 @@ export default {
                 }
       },
 
-      handleCheckAllChange(val) { // 全选
+      // 全选
+      handleCheckAllChange(val) { 
         this.allElectionFun();
-         this.checkedPeople = val ? this.allElection : [];
-         this.isIndeterminate = false;
-           // console.log(this.checkedCities);
-              this.selectionFun(this.checkedPeople);
-             //console.log(this.selectionArr)
+        this.checkedPeople = val ? this.allElection : [];
+        this.isIndeterminate = false;
+          // console.log(this.checkedCities);
+        this.selectionFun(this.checkedPeople);
+          //console.log(this.selectionArr)
       },
 
-      handleCheckedChange(value) { // 选中
-             let checkedCount = value.length;
-             this.checkAll = checkedCount === this.responseList.length;
-              this.isIndeterminate = checkedCount > 0 && checkedCount < 
-              this.responseList.length;
-               this.selectionFun(value);
-             //console.log(this.selectionArr)
-      },
-
-      changeBtn(){
-            this.kjIsShow = !this.kjIsShow
-            if(this.kjIsShow){
-                this.kjIsShow = true;
-                this.checkAll = true;
-            }else{
-                this.bkjIsShow = true;
-                this.checkAll = false;
-                this.checkedOne = false;
-            }
-      },
-
-      changeBtn2(){
-            this.bkjIsShow = !this.bkjIsShow
-            if(this.bkjIsShow){
-                this.kjIsShow = false;
-                this.checkAll = false;
-            }else{
-                this.kjIsShow = true;
-                this.checkAll = true;
-                this.checkedOne = true;
-            }
+      // 选中
+      handleCheckedChange(value) { 
+        let checkedCount = value.length;
+        this.checkAll = checkedCount === this.responseList.length;
+        this.isIndeterminate = checkedCount > 0 && checkedCount < 
+        this.responseList.length;
+        this.selectionFun(value);
+          //console.log(this.selectionArr)
       },
 
       /* 日历相关 */
@@ -673,63 +728,31 @@ export default {
         let eventapi = this.datasToCalendar.calendarFunction;
 
         for(var m in this.timeBlock){
-                if(this.timeBlock[m].timeUnit == eventapi.idOfSelectTime){
-                  let str = this.timeBlock[m].timeUnit.split('-');
-                  this.eventDate = str[0] + '-' + str[1] + '-' + str[2];
-                  this.eventTime = str[3];
-                  this.attend = this.timeBlock[m].attendNum;
-                  this.absent = this.timeBlock[m].absentNum;
-                  this.attendPro = this.timeBlock[m].attendPro;
-                  this.absentPro = this.timeBlock[m].absentPro;
-                  this.attendPeople = this.timeBlock[m].attendName;
-                  this.absentPeople = this.timeBlock[m].absentName;
-                  
-                }
-              }
-
-            for(let i = 0; i<eventapi.events.length; i++){
-              if(eventapi.events[i].id === eventapi.idOfSelectTime){
-                eventapi.events[i].backgroundColor = '#333333';
-              }
-            }
+          if(this.timeBlock[m].timeUnit == eventapi.idOfSelectTime){
+            let str = this.timeBlock[m].timeUnit.split('-');
+            this.eventDate = str[0] + '-' + str[1] + '-' + str[2];
+            this.eventTime = str[3];
+            this.attend = this.timeBlock[m].attendNum;
+            this.absent = this.timeBlock[m].absentNum;
+            this.attendPro = this.timeBlock[m].attendPro;
+            this.absentPro = this.timeBlock[m].absentPro;
+            this.attendPeople = this.timeBlock[m].attendName;
+            this.absentPeople = this.timeBlock[m].absentName;      
+          }
+        }
         
-        /* this.$api.event.getTimeDetail(this.$route.params.eventCode,this.$route.params.hostCode,
-            {
-              eventCode: this.$route.params.eventCode,
-              hostCode: this.$route.params.hostCode
-            }
-          ).then(res => {
-            console.log(res.data)
-            if(res.data.code === 200){
-               let timeDetail = res.data.data.timeDetail;
-               
-              for(var m in timeDetail){
-                if(timeDetail[m].timeUnit == eventapi.idOfSelectTime){
-                  let str = timeDetail[m].timeUnit.split('-');
-                  this.eventDate = str[0] + '-' + str[1] + '-' + str[2];
-                  this.eventTime = str[3];
-                  this.canDo = timeDetail[m].attendNum;
-                  this.canNotDo = timeDetail[m].absentNum;
-                  this.canDoPro = timeDetail[m].attendPro;
-                  this.canNotDoPro = timeDetail[m].absentPro;
-                  this.canPeople = timeDetail[m].attendName;
-                  this.canNotPeople = timeDetail[m].absentName;
-                  
-                }
-              }
-
-            }
-          }).catch(error => {
-                console.log(error);
-          });    
-           */
-                    
-            
+        //添加点击时遮罩
+        /* for(let i = 0; i<eventapi.events.length; i++){
+          if(eventapi.events[i].id === eventapi.idOfSelectTime){
+            eventapi.events[i].backgroundColor = '#333333';
+          }
+        }
+        console.log(eventapi.idOfSelectTime); */
       },
+
       // 动态调整日历的格式：实现的时候与表单进行绑定（第三期任务）
       changeCalendarFormat() {
         let formatapi = this.datasToCalendar.calendarFormat;
-    
         formatapi.slotDuration = '00:30' 
         formatapi.defaultTimedEventDuration = '00:30'
         formatapi.slotMinTime = "10:00:00"
@@ -745,8 +768,6 @@ export default {
           end: '2020-11-19'
         }
       }
-
-
     }
 }
 </script>
@@ -766,6 +787,10 @@ export default {
   position: relative;
   margin: 0 auto;
 }
+
+/* .fc-event-main :hover{
+  border: 2px solid #333333;
+} */
 
 .title{
   position: absolute;
@@ -881,7 +906,7 @@ export default {
 }
 
 .box-card {
-  height: 160px;
+  height: 200px;
   width: 200px;
 }
 
@@ -904,7 +929,7 @@ export default {
 
 .left_wrapper2{
     position: absolute;
-    top:400px;
+    top:450px;
     left: -60px;
 }
 
@@ -1004,14 +1029,15 @@ export default {
   color: #409EFF;
 }
 
-.bottom_wrapper{
+/* .bottom_wrapper{
   position: absolute;
   top: 700px;
   left: 150px;
-}
+} */
 
 .commentList{
   /* height: 300px; */
+  margin-left: 30px;
   width: 600px;
 }
 
@@ -1020,9 +1046,9 @@ export default {
   margin-bottom: 10px;
 }
 
-.box-card_bottom{
-  /* height: 200px; */
+/* .box-card_bottom{
+  height: 200px;
   width: 900px;
 }
-
+ */
 </style>
