@@ -11,15 +11,18 @@ const CreateEvent = () => import('../views/create_event/CreateEvent')
 const ShareLinks = () => import('../views/create_event/ShareLinks')
 const FinalResult = () => import('../views/result/FinalResult')
 const Edit = () => import('../views/create_event/Edit')
+const Update = () => import('../views/choose_event/UpdateChoose')
 
 const Choose = () => import('../views/choose_event/Choose')
 const ChooseSuccess = () => import('../views/choose_event/ChooseSuccess')
-const Update = () => import('../views/choose_event/UpdateChoose')
 
 const EnterResults = () => import('../views/result/EnterResults')
 const Result = () => import('../views/result/Result')
 const CopyLink = () => import('../views/result/CopyLink')
 const SendRequest = () => import('../views/result/SendRequest')
+
+const About = () => import('../views/About')
+const NotFound = () => import('../views/NotFound')
 
 
 Vue.use(VueRouter)
@@ -117,13 +120,24 @@ const routes = [
     path: '/:eventCode/final',
     name: 'finalresult',
     component: FinalResult
+  },
+  {
+    path: '/about',
+    component: About
+  },
+
+  //404页面匹配规则，必须放在最后
+  {
+    path: '*',
+    name: 'NotFound',
+    component: NotFound
   }
 
 ]
 
 const router = new VueRouter({
   routes: routes,
-  mode: 'history',
+  //mode: 'history',
   base: process.env.BASE_URL,
   routes
 })

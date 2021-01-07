@@ -85,6 +85,12 @@ const event = {
             params: params
         });
     },
+    //发送重新填写邮件
+    sendUpdateEmail(eventCode,idCode,params) {
+        return axios.post(base.baseUrl + `/${eventCode}/result/${idCode}/email`, null, {
+            params: params
+        });
+    },
 
     /**
      *  最终结果页面相关
@@ -93,6 +99,14 @@ const event = {
     getFinalResult(eventCode,params) {
         return axios.get(base.baseUrl + `/${eventCode}/final`, {
             params: params
+        });
+    },
+
+    //导入日历
+    exportToCalendar(eventCode,params) {
+        return axios.get(base.baseUrl + `/${eventCode}/final/export`, null, {
+            params: params,
+            responseType: 'blob'
         });
     }
 }

@@ -20,12 +20,15 @@
 
     <!-- tips -->
     <div class="tips">
-        <div class="timeTips1"></div>
+        <div class="cr1"></div>
+        <div class="cr2"></div>
+        <div class="cr3"></div>
         <div class="timeTips1_text">
             <p>
-                <span>发起者选择的时间</span>
+                <span>颜色越深，选择该时间的人数越多</span>
             </p>
         </div>
+
         <div class="timeTips2"></div>
         <div class="timeTips2_text">
             <p>
@@ -33,14 +36,7 @@
             </p>
         </div>
 
-        <div class="cr1"></div>
-        <div class="cr2"></div>
-        <div class="cr3"></div>
-        <div class="timeTips3_text">
-            <p>
-                <span>其他参与者选择的时间<br>（颜色越深，选择该时间的人数越多）</span>
-            </p>
-        </div>
+        
         <!-- <div>
             <button class="btn_pb" @click="changeBtn" v-text="btnText"></button>
             <div class="test" v-show="isShow"></div>
@@ -120,6 +116,8 @@ export default {
             { required:true, message:'请输入您的姓名', trigger: 'blur'}
           ]
         },
+
+      color:[],
 
       responseData:'',
       /* 日历相关 */
@@ -217,12 +215,15 @@ export default {
             startTime: highlightHours[0],
             endTime: highlightHours[1], 
           }
-          let hiddenDay = res.data.data.calendar.hiddenDays.split(",")
-          formatapi.hiddenDays = []
-          for(var i = 0; i<hiddenDay.length; i++){
-            if(typeof(hiddenDay[i]) == "number" ){
-              formatapi.hiddenDays.push(Number(hiddenDay[i]));
-            }
+          if(res.data.data.calendar.hiddenDays){
+                    let hiddenDay = res.data.data.calendar.hiddenDays.split(",")
+                    
+                    formatapi.hiddenDays = []
+                    for(var i = 0; i<hiddenDay.length; i++){
+                        
+                            formatapi.hiddenDays.push(Number(hiddenDay[i]));
+                        
+                    }
           }
           //console.log(formatapi.hiddenDays);
           formatapi.validRange = {
@@ -235,37 +236,29 @@ export default {
           this.eventInfo = res.data.data.createInfo.eventDescription;
           this.eventDuration = res.data.data.createInfo.eventDuration;
           
-          //将传回的数据调整成日历所需格式
-          let time = res.data.data.createInfo.timeUnit;
-
-          let timeStr = time.split(",");
-
-          //日历中显示发起者所选的时间
-          for (let index = 0; index < timeStr.length; index++) {
-              var nowEvent = {}
-              nowEvent.id = timeStr[index];
-              nowEvent.start = timeUnitIdToTime(timeStr[index]);
-              nowEvent.groupId = 'hostSelect';
-              eventapi.events.push(nowEvent);
+          /* if(res.data.data.colorRange.range_zero){
+            let rangeZeroStr = res.data.data.colorRange.range_zero.split(",");
+            this.addrangeZeroBlock(rangeZeroStr);
+          } */
+          
+          if(res.data.data.colorRange.range_one){
+            let rangeOneStr = res.data.data.colorRange.range_one.split(",");
+            this.addrangeOneBlock(rangeOneStr);
           }
 
-          //将事件颜色替换成colorRange
-          let rangeOne = res.data.data.colorRange.range_one;
-          let rangeOneStr = rangeOne.split(",");
-          this.addrangeOneBlock(rangeOneStr);
+          if(res.data.data.colorRange.range_two){
+            let rangeTwoStr = res.data.data.colorRange.range_two.split(",");
+            this.addrangeTwoBlock(rangeTwoStr);
+          }
 
-          let rangeTwo = res.data.data.colorRange.range_two;
-          let rangeTwoStr = rangeTwo.split(",");
-          this.addrangeTwoBlock(rangeTwoStr);
+          if(res.data.data.colorRange.range_three){
+            let rangeThreeStr = res.data.data.colorRange.range_three.split(",");
+            this.addrangeThreeBlock(rangeThreeStr);
+          }
 
-          let rangeThree = res.data.data.colorRange.range_three;
-          let rangeThreeStr = rangeThree.split(",");
-          this.addrangeTwoBlock(rangeThreeStr);
-
-          /* if(res.data.data.isTimePublic == 1){
-            this.publicBox = true; //“公开自己的选择”框是否可见
+         /*  for(let m = 0; m<this.color.length; m++){
+            console.log(this.color[m].id+"&"+this.color[m].groupId)
           } */
-          //console.log(eventapi.events)
         }
       }).catch(error => {
           console.log(error);
@@ -285,16 +278,23 @@ export default {
             var idTo;
             if(eventapi.events[0].groupId === 'inviteeSelect'){
               idTo = eventapi.events[0].id;
-            }else{
-              idTo = ''; //传数据时第一个值会是一个未选择的值，所以赋值为空，未解决
-            }
-            
-            for (let index = 0; index < eventapi.events.length; index++) {
+              for (let index = 1; index < eventapi.events.length; index++) {
               if(eventapi.events[index].groupId === 'inviteeSelect'){
                 idTo += ',' + eventapi.events[index].id;
               };
               /* eventsId += ',' + eventapi.events[index].id; */
             }
+            }else{
+              idTo = ''; //传数据时第一个值会是一个未选择的值，所以赋值为空，未解决
+              for (let index = 0; index < eventapi.events.length; index++) {
+              if(eventapi.events[index].groupId === 'inviteeSelect'){
+                idTo += ',' + eventapi.events[index].id;
+              };
+              /* eventsId += ',' + eventapi.events[index].id; */
+            }
+            }
+            
+           
             
             //调用接口传数据
             this.$api.event.attendEvent(this.$route.params.eventCode,{
@@ -331,47 +331,94 @@ export default {
       });
     },
     
-    //将颜色替换成colorRange
+    //colorRange相关
+    /* addrangeZeroBlock(rangeZeroStr){
+      let eventapi = this.datasToCalendar.calendarFunction;
+      //将时间块存入本地color数组
+      for (let index = 0; index < rangeZeroStr.length; index++) {
+                var zero = {}
+                zero.id = rangeZeroStr[index];
+                zero.groupId = 'hostSelect';
+                this.color.push(zero);
+            }
+      
+      //将时间块存入events数组
+      for (let index = 0; index < rangeZeroStr.length; index++) {
+              var zero = {}
+              zero.id = rangeZeroStr[index];
+              zero.start = timeUnitIdToTime(rangeZeroStr[index]);
+              zero.groupId = 'hostSelect';
+              zero.backgroundColor = '#8ad0ff';
+              zero.borderColor = '#8ad0ff';
+              eventapi.events.push(zero);
+      }
+    }, */
+
     addrangeOneBlock(rangeOneStr){
       let eventapi = this.datasToCalendar.calendarFunction;
-      for(let i = 0; i<eventapi.events.length; i++){
-        for(let j = 0; j<rangeOneStr.length; j++){
-          if(eventapi.events[i].id == rangeOneStr[j]){
-            eventapi.events[i].backgroundColor = '#91d5ff';
-            eventapi.events[i].borderColor = '#91d5ff';
-            eventapi.events[i].groupId = 'rangeOne';
-            eventapi.events[i].title = '';
+      //将时间块存入本地color数组
+      for (let index = 0; index < rangeOneStr.length; index++) {
+              var one = {}
+              one.id = rangeOneStr[index];
+              one.groupId = 'rangeOne';
+              this.color.push(one);
           }
-        }
-      }  
+
+      //将时间块存入events数组
+      for (let index = 0; index < rangeOneStr.length; index++) {
+              var one = {}
+              one.id = rangeOneStr[index];
+              one.start = timeUnitIdToTime(rangeOneStr[index]);
+              one.groupId = 'hostSelect';
+              one.backgroundColor = '#8ad0ff';
+              one.borderColor = '#8ad0ff';
+              eventapi.events.push(one);
+      }
     },
 
     addrangeTwoBlock(rangeTwoStr){
       let eventapi = this.datasToCalendar.calendarFunction;
-      for(let i = 0; i<eventapi.events.length; i++){
-        for(let j = 0; j<rangeTwoStr.length; j++){
-          if(eventapi.events[i].id == rangeTwoStr[j]){
-            eventapi.events[i].backgroundColor = '#69c0ff';
-            eventapi.events[i].borderColor = '#69c0ff';
-            eventapi.events[i].groupId = 'rangeTwo';
-            eventapi.events[i].title = '';
-          }
-        }
-      }  
+      //将时间块存入本地color数组
+      for (let index = 0; index < rangeTwoStr.length; index++) {
+              var two = {}
+              two.id = rangeTwoStr[index];
+              two.groupId = 'rangeTwo';
+              this.color.push(two);
+      }
+
+      //将时间块存入events数组
+      for (let index = 0; index < rangeTwoStr.length; index++) {
+              var two = {}
+              two.id = rangeTwoStr[index];
+              two.start = timeUnitIdToTime(rangeTwoStr[index]);
+              two.groupId = 'hostSelect';
+              two.backgroundColor = '#3598f0';
+              two.borderColor = '#3598f0';
+              eventapi.events.push(two);
+      }
     },
 
     addrangeThreeBlock(rangeThreeStr){
       let eventapi = this.datasToCalendar.calendarFunction;
-      for(let i = 0; i<eventapi.events.length; i++){
-        for(let j = 0; j<rangeThreeStr.length; j++){
-          if(eventapi.events[i].id == rangeThreeStr[j]){
-            eventapi.events[i].backgroundColor = '#40a9ff';
-            eventapi.events[i].borderColor = '#40a9ff';
-            eventapi.events[i].groupId = 'rangeThree';
-            eventapi.events[i].title = '';
-          }
-        }
-      }  
+
+      //将时间块存入本地color数组
+      for (let index = 0; index < rangeThreeStr.length; index++) {
+              var three = {}
+              three.id = rangeThreeStr[index];
+              three.groupId = 'rangeThree';
+              this.color.push(three);
+      }
+
+      //将时间块存入events数组
+      for (let index = 0; index < rangeThreeStr.length; index++) {
+              var three = {}
+              three.id = rangeThreeStr[index];
+              three.start = timeUnitIdToTime(rangeThreeStr[index]);
+              three.groupId = 'hostSelect';
+              three.backgroundColor = '#0259bd';
+              three.borderColor = '#0259bd';
+              eventapi.events.push(three);
+      }
     },
 
     /* 日历相关 */
@@ -379,9 +426,47 @@ export default {
     getTimeUnit(timeUnit) {
       this.datasToCalendar.calendarFunction.events = timeUnit;
     },
-    // 结果页面点击时间块的时候，子组件发送时间块的id给父组件
+    // 选择时间页面点击时间块的时候，子组件发送时间块的id给父组件
     getTimeUnitId(id) {
-      this.idOfSelectTime = id;
+      this.datasToCalendar.calendarFunction.idOfSelectTime = id;
+      let formatapi = this.datasToCalendar.calendarFormat;  
+      let eventapi = this.datasToCalendar.calendarFunction;
+      for(let i = 0; i<eventapi.events.length; i++){
+          if(eventapi.events[i].id === eventapi.idOfSelectTime){
+            if(eventapi.events[i].groupId === 'hostSelect'){
+              eventapi.events[i].groupId = 'inviteeSelect';
+              eventapi.events[i].backgroundColor = '#002d70';
+              eventapi.events[i].borderColor = '#002d70';
+            }
+            else if(eventapi.events[i].groupId === 'inviteeSelect'){
+                    for(let j = 0; j<this.color.length; j++){
+                      if(this.color[j].id === eventapi.idOfSelectTime){
+                        if(this.color[j].groupId === 'hostSelect'){
+                          eventapi.events[i].groupId = 'hostSelect';
+                          eventapi.events[i].backgroundColor = '#8ad0ff';
+                          eventapi.events[i].borderColor = '#8ad0ff';
+                          
+                        }else if(this.color[j].groupId === 'rangeOne'){
+                          eventapi.events[i].groupId = 'hostSelect';
+                          eventapi.events[i].backgroundColor = '#8ad0ff';
+                          eventapi.events[i].borderColor = '#8ad0ff';
+                                          
+                        }else if(this.color[j].groupId === 'rangeTwo'){
+                          eventapi.events[i].groupId = 'hostSelect';
+                          eventapi.events[i].backgroundColor = '#3598f0';
+                          eventapi.events[i].borderColor = '#3598f0';
+                                                   
+                        }else if(this.color[j].groupId === 'rangeThree'){
+                          eventapi.events[i].groupId = 'hostSelect';
+                          eventapi.events[i].backgroundColor = '#0259bd';
+                          eventapi.events[i].borderColor = '#0259bd';
+                                                    
+                        }
+                      }
+                    }
+                 }
+          }
+      } 
     },
     // 动态调整日历的格式：实现的时候与表单进行绑定（第三期任务）
     changeCalendarFormat() {
@@ -473,21 +558,48 @@ export default {
   left: 860px;
 }
 
-.timeTips1 {
+.cr1 {
+  border-width: 0px;
   position: absolute;
+  top: 60px;
   width: 15px;
   height: 15px;
-  background-color: #3788d8;
+  display: flex;
+  background-color: #8ad0ff;
+}
+
+.cr2 {
+  border-width: 0px;
+  position: absolute;
+  top: 60px;
+  left: 20px;
+  width: 15px;
+  height: 15px;
+  display: flex;
+  background-color: #3598f0;
+}
+
+.cr3 {
+  border-width: 0px;
+  position: absolute;
+  top: 60px;
+  left: 40px;
+  width: 15px;
+  height: 15px;
+  display: flex;
+  background-color: #0259bd;
 }
 
 .timeTips1_text {
   position: absolute;
-  width: 144px;
-  height: 22px;
-  left: 25px;
+  top: 60px;
+  left: 65px;
+  width: 250px;
+  height: 30px;
   font-weight: 600;
   font-size: 14px;
-  color: #333333;  
+  color: #333333; 
+  line-height: 15px;
 }
 
 .timeTips2 {
@@ -497,7 +609,7 @@ export default {
   width: 15px;
   height: 15px;
   display: flex;
-  background-color: #003399;
+  background-color: #002d70;
 }
 
 .timeTips2_text {
@@ -509,50 +621,6 @@ export default {
   font-weight: 600;
   font-size: 14px;
   color: #333333;  
-}
-
-.cr1 {
-  border-width: 0px;
-  position: absolute;
-  top: 60px;
-  width: 15px;
-  height: 15px;
-  display: flex;
-  background-color: #91d5ff;
-}
-
-.cr2 {
-  border-width: 0px;
-  position: absolute;
-  top: 60px;
-  left: 20px;
-  width: 15px;
-  height: 15px;
-  display: flex;
-  background-color: #69c0ff;
-}
-
-.cr3 {
-  border-width: 0px;
-  position: absolute;
-  top: 60px;
-  left: 40px;
-  width: 15px;
-  height: 15px;
-  display: flex;
-  background-color: #40a9ff;
-}
-
-.timeTips3_text {
-  position: absolute;
-  top: 60px;
-  left: 60px;
-  width: 250px;
-  height: 30px;
-  font-weight: 600;
-  font-size: 14px;
-  color: #333333; 
-  line-height: 15px;
 }
 
 .demo-app {

@@ -11,6 +11,10 @@
         <div class="eventInfo">
             <p><span>{{ eventInfo }}</span></p>
         </div>
+
+        <div class="eventDuration">
+            <p><span>持续时间：{{ eventDuration }}</span></p>
+        </div>
      </div>
 
      <!-- 左侧栏 -->
@@ -22,7 +26,7 @@
             <div class="item" >
                 <p type="text" @click="copyLink()">邀请更多人</p>
                 <p @click="eventChoose()">增加回应</p>
-                <p @click="edit()">编辑事件</p>
+                <p @click="edit()">重新编辑</p>
                 <p @click="drawer = true;openDrawer()">查看留言</p>
             </div>
         </el-card>
@@ -31,6 +35,7 @@
               title="选定回应者的留言"
               :visible.sync="drawer"
               :direction="direction"
+              :append-to-body="true"
               >
               <el-scrollbar style="height: 100%">
                 <div class="commentList">
@@ -45,9 +50,7 @@
               </el-scrollbar>
             </el-drawer>
      </div>
-
-     
-
+       
      <!-- 左下侧栏 -->
      <div class="left_wrapper2">
        
@@ -65,7 +68,7 @@
                </el-checkbox>
                <!-- <i class="icon iconfont iconkejian" @click="drawer = true;openDrawer()"></i> -->
                <!-- <i class="icon iconfont iconbukejian" v-show="bkjIsShow" @click="changeBtn2"></i> -->
-               <span @click="dialogTableVisible3 = true"><i class="icon iconfont iconyoujian" ></i></span>
+               <span @click="dialogTableVisible3 = true;openSendEmail()"><i class="icon iconfont iconyoujian" ></i></span>
                <span @click="deleteResponse()"><i class="icon iconfont iconshanchu"></i></span>
                <div class="line"></div>
                </div>
@@ -74,13 +77,9 @@
                 <div v-for="(item,i) in responseList" @mouseenter="show(i);" @mouseleave="leave()">
                 <el-checkbox
                   class="checkedPeople" 
-                  
-                  
                   :key="i"
-                  :label="item.name"
-                  
-                 
-                 >{{item.name}} 
+                  :label="item.name"               
+                >{{item.name}} 
                  </el-checkbox>
                 </div>
               </el-checkbox-group>
@@ -91,22 +90,27 @@
         </el-card>
 
         <!-- 发送重新选择提醒到指定参与者的邮箱 -->
-        <el-dialog title="发送重新选择提醒到指定参与者的邮箱" :visible.sync="dialogTableVisible3" :append-to-body="true">
+        <el-dialog title="发送邮件，提醒参与者重新选择" :visible.sync="dialogTableVisible3" :append-to-body="true">
 
           <el-form ref="sendEmailForm"  :model="sendEmailForm">
-            <el-form-item label="邮箱地址（以,隔开）">
-              <el-input v-model="sendEmailForm.email.value" autocomplete="off"></el-input>
+            <el-form-item 
+                          
+                          :rules="[
+                            { required: true,message: '请输入邮箱地址',trigger: 'blur' },
+                            { type: 'email', message: '请输入正确的邮箱地址', trigger:['blur', 'change']}
+                          ]"
+                          v-for="(item,i) in sendEmailForm.email"
+                          :key="item.idCode" 
+                          :label="item.name"
+                          :prop="'email.' + i + '.value'"
+            >
+              <el-input v-model="item.value" autocomplete="off"></el-input>
             </el-form-item>
-            
-           <!--  <el-form-item>
-              <el-button type="primary" class="send" @click="sendrequest('sendEmailForm')" style="font-size:30px;">
-                发送
-              </el-button>
-            </el-form-item> -->
+          
           </el-form>
 
           <span slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="dialogTableVisible3 = false;sendrequest('sendEmailForm')">发 送</el-button>
+            <el-button type="primary" @click="dialogTableVisible3 = false;sendEmail('sendEmailForm')">发 送</el-button>
             <el-button  @click="dialogTableVisible3 = false">取 消</el-button>
           </span>
         </el-dialog>
@@ -119,7 +123,7 @@
         <div class="timeTips1"></div>
         <div class="timeTips1_text">
             <p>
-                <span>发起者选择的时间（右上角数字为未选择该时间的人数）</span>
+                <span>发起者选择的时间（右侧数字为未选择该时间的人数）</span>
             </p>
         </div>
         <div class="timeTips2"></div>
@@ -138,6 +142,7 @@
     </div>
     
     <!-- 日历区 -->
+    
     <Calendar class="demo-app"
               @getTimeUnit='getTimeUnit' 
               @getTimeUnitId='getTimeUnitId'
@@ -161,19 +166,19 @@
 
         <el-card class="box-card3" shadow="hover">
             <div slot="header" class="clearfix">
-                <span>生成事件结果</span>               
+                <span>生成结果</span>               
             </div>
             <div class="nameAndInfo">
-              <span>事件名称：</span><br>
+              <span>活动名称：</span><br>
               <span class="content">{{ eventName }}</span><br>
-              <span>事件描述：</span><br>
+              <span>活动描述：</span><br>
               <span class="content">{{ eventInfo }}</span>
             </div>
 
             <div class="dateAndTime">
-              <span>事件日期：</span><br>
+              <span>活动日期：</span><br>
               <span class="content">{{ eventDate }}</span><br>
-              <span>事件时间：</span><br>
+              <span>活动时间：</span><br>
               <span class="content">{{ eventTime }}</span>
             </div>
 
@@ -183,33 +188,11 @@
               <span>不能参加的人数：</span><br>
               <el-button type="text" @click="dialogTableVisible2 = true" class="content">{{ absent }} ({{ absentPro }}%)</el-button>
             </div>
-            <el-button class="btnToFinal" @click="finalResult()">点击生成事件结果</el-button>
+            <el-button class="btnToFinal" @click="finalResult()" type="primary">点击生成最终结果</el-button>
         </el-card>
 
         
      </div>
-
-     <!-- 下侧留言栏 -->
-     <!-- <div class="bottom_wrapper">
-       <el-card class="box-card_bottom" shadow="hover">
-         <div slot="header" class="clearfix">
-                <span>他们的留言</span>
-         </div>
-
-         <el-scrollbar style="height: 100%">
-           <div class="commentList">
-             <div class="comment" 
-                  v-for="(item,i) in commentList"
-                  :key="i" 
-                  :label="item.name">
-              {{item.name}}：{{ item.comment }}
-
-             </div>
-           </div>
-         </el-scrollbar>
-
-       </el-card>
-     </div> -->
 
    </div>
  </div>
@@ -229,6 +212,7 @@ export default {
     return{ 
       eventName: "",
       eventInfo: "",
+      eventDuration: '',
       eventDate: "",
       eventTime: "",
       attend: "",
@@ -250,6 +234,8 @@ export default {
             value: ''
           }],  
       },
+
+      emails: '',//存储填写的邮箱地址，传给后端
 
       drawer: false,
       direction: 'ltr',
@@ -351,6 +337,7 @@ export default {
       /* 将以下两个函数放在mounted()时，全选无法生效 */
      /*  this.allElectionFun();
       this.DefaultFullSelection(); */
+      
     },
     methods: {
       //跳转
@@ -375,8 +362,69 @@ export default {
       },
 
       //发送提醒邮件
-      sendrequest(sendEmailForm){
+      sendEmail(sendEmailForm){
+        this.$refs[sendEmailForm].validate((valid) => {
+          if (valid) {
+            this.emails = this.sendEmailForm.email[0].value;
+            if(this.sendEmailForm.email.length > 1){
+              for(var i = 1; i<this.sendEmailForm.email.length; i++){
+                this.emails += ","+this.sendEmailForm.email[i].value;
+              }
+            }
 
+            this.selectedResponse = this.selectionArr[0].idCode;
+            for (let index = 0; index < this.responseList.length; index++) {
+              for (let index2 = 1; index2 < this.selectionArr.length; index2++){
+                if(this.responseList[index].name === this.selectionArr[index2].name){
+                  this.selectedResponse += ","+this.selectionArr[index2].idCode;
+                };
+              }
+            }
+
+            /* console.log(this.emails);
+            console.log(this.selectedResponse); */
+            this.$api.event.sendUpdateEmail(this.$route.params.eventCode,this.selectedResponse,
+            {
+              /* eventCode: this.$route.params.eventCode,
+              idCode: this.selectedResponse, */
+              to: this.emails,
+            }).then(res => {
+              
+              if(res.data.code === 200){
+                this.$message({
+                    type: 'success',
+                    message: '发送成功!'
+                });
+              }
+            }).catch(error => {
+              console.log(this.selectedResponse);
+              console.log(this.emails);
+              //console.log(res.data);
+                this.$message.error('发送失败！');
+                console.log(error);
+            })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+
+      //打开填写邮箱dialog
+      openSendEmail(){
+        
+        this.sendEmailForm.email = [];
+        for(var i = 0; i<this.partners.length; i++){
+          for(var index = 0; index < this.selectionArr.length;index++){
+            if(this.partners[i].name === this.selectionArr[index].name){
+              var Arr = {}
+              Arr.name = this.partners[i].name;
+              Arr.idCode = this.partners[i].idCode;
+              this.sendEmailForm.email.push(Arr);
+              
+            }
+          }
+        }
       },
 
       //打开留言板
@@ -441,7 +489,7 @@ export default {
                   message: '删除成功!'
               });
                 //this.$router.push({ name: 'result', params: { eventCode: this.$route.params.eventCode, hostCode: this.$route.params.hostCode }})
-                location. reload();
+                location.reload();
               }
             }).catch(error => {
                 console.log(error);
@@ -482,12 +530,15 @@ export default {
                 startTime: highlightHours[0],
                 endTime: highlightHours[1], 
               }
-              let hiddenDay = res.data.data.calendar.hiddenDays.split(",")
-              formatapi.hiddenDays = []
-              for(var i = 0; i<hiddenDay.length; i++){
-                if(typeof(hiddenDay[i]) == "number" ){
-                  formatapi.hiddenDays.push(Number(hiddenDay[i]));
-                }
+              if(res.data.data.calendar.hiddenDays){
+                    let hiddenDay = res.data.data.calendar.hiddenDays.split(",")
+                    
+                    formatapi.hiddenDays = []
+                    for(var i = 0; i<hiddenDay.length; i++){
+                        
+                            formatapi.hiddenDays.push(Number(hiddenDay[i]));
+                        
+                    }
               }
               //console.log(formatapi.hiddenDays);
               formatapi.validRange = {
@@ -498,6 +549,7 @@ export default {
               //事件相关渲染
               this.eventName = res.data.data.createInfo.eventName;
               this.eventInfo = res.data.data.createInfo.eventDescription;
+              this.eventDuration = res.data.data.createInfo.eventDuration;
             }
         }).catch(error => {
                 console.log(error);
@@ -555,6 +607,8 @@ export default {
                 var num = {}
                 num.id = eventapi.events[i].id;
                 num.title = eventapi.events[i].title;
+                num.backgroundColor = eventapi.events[i].backgroundColor;
+                num.borderColor = eventapi.events[i].borderColor;
                 this.titleStr.push(num);
               }
                
@@ -571,14 +625,14 @@ export default {
       addInviteeBlock(i,partners,responseList) {
         let eventapi = this.datasToCalendar.calendarFunction;
         for(var l = 0; l<partners.length; l++){
-          if(this.partners[l].name === responseList[i].name){
+          if(this.partners[l].idCode === responseList[i].idCode){
             for (let index = 0; index < partners[l].timeUnit.length; index++) {
               var oneEvent = {}
               oneEvent.id = partners[l].timeUnit[index];
               oneEvent.start = timeUnitIdToTime(partners[l].timeUnit[index]);
               oneEvent.groupId = 'one';
-              oneEvent.backgroundColor = '#95de64';
-              oneEvent.borderColor = '#95de64'
+              oneEvent.backgroundColor = '#3788d8';
+              oneEvent.borderColor = '#3788d8'
               eventapi.events.push(oneEvent);
             }
           }
@@ -610,8 +664,8 @@ export default {
         for(let i = 0; i<eventapi.events.length; i++){
           for(let j = 0; j<preferTime.length; j++){
             if(eventapi.events[i].id == preferTime[j]){
-              eventapi.events[i].backgroundColor = '#FAAD14';
-              eventapi.events[i].borderColor = '#FAAD14';
+              eventapi.events[i].backgroundColor = '#95de64';
+              eventapi.events[i].borderColor = '#95de64';
               eventapi.events[i].title = '';
             }
           }
@@ -624,8 +678,8 @@ export default {
         let eventapi = this.datasToCalendar.calendarFunction;
         for(let i = 0; i<eventapi.events.length; i++){
             if(eventapi.events[i].id == finalTime){
-              eventapi.events[i].backgroundColor = '#171972';
-              eventapi.events[i].borderColor = '#171972';
+              eventapi.events[i].backgroundColor = '#002d70';
+              eventapi.events[i].borderColor = '#002d70';
               eventapi.events[i].title = '';
             }
         }
@@ -678,10 +732,10 @@ export default {
 
       //获取需要默认显示的数据
       allElectionFun() { 
-           this.allElection = [];
-             for (var i = 0; i < this.responseList.length; i++) {
-               this.allElection.push(this.responseList[i].name)
-           }
+        this.allElection = [];
+        for (var i = 0; i < this.responseList.length; i++) {
+          this.allElection.push(this.responseList[i].name)
+        }
       },
 
       // 初始化 默认全部选中
@@ -695,14 +749,14 @@ export default {
 
       // 获取选中的对象
       selectionFun(selectionArr) { 
-                this.selectionArr = [];
-                for (var i = 0; i < this.responseList.length; i++) {
-                  for (var j = 0; j < selectionArr.length; j++) {
-                          if (selectionArr[j] === this.responseList[i].name) {
-                            this.selectionArr.push(this.responseList[i])
-                      }
-                  }
-                }
+        this.selectionArr = [];
+        for (var i = 0; i < this.responseList.length; i++) {
+          for (var j = 0; j < selectionArr.length; j++) {
+            if (selectionArr[j] === this.responseList[i].name) {
+              this.selectionArr.push(this.responseList[i])
+            }
+          }
+        }
       },
 
       // 全选
@@ -710,9 +764,7 @@ export default {
         this.allElectionFun();
         this.checkedPeople = val ? this.allElection : [];
         this.isIndeterminate = false;
-          // console.log(this.checkedCities);
         this.selectionFun(this.checkedPeople);
-          //console.log(this.selectionArr)
       },
 
       // 选中
@@ -750,27 +802,34 @@ export default {
           }
         }
         
-        
         //添加点击时标记
         for(let i = 0; i<eventapi.events.length; i++){
-            if(eventapi.events[i].title === '✔'){
-              for(let k = 0; k<this.titleStr.length; k++){
-                if(eventapi.events[i].id === this.titleStr[k].id){
-                  eventapi.events[i].title = this.titleStr[k].title;
-                }
+          if(eventapi.events[i].backgroundColor === '#002d70'){
+            for(let k = 0; k<this.titleStr.length; k++){
+              if(eventapi.events[i].id === this.titleStr[k].id){
+                eventapi.events[i].title = this.titleStr[k].title;
+                eventapi.events[i].backgroundColor = this.titleStr[k].backgroundColor;
+                eventapi.events[i].borderColor = this.titleStr[k].borderColor;
+                
               }
-              console.log(eventapi.events[i].title);
             }
-            if(eventapi.events[i].id === eventapi.idOfSelectTime){
-            //eventapi.events[i].backgroundColor = '#333333';
-              eventapi.events[i].title = '✔';
-            }
-
-
+          }
+          if(eventapi.events[i].id === eventapi.idOfSelectTime){
+            eventapi.events[i].title = '✔';
+            eventapi.events[i].backgroundColor = '#002d70';
+            eventapi.events[i].borderColor = '#002d70';
+          }
         }
-        //console.log(str);
-        
-        //console.log(eventapi.idOfSelectTime);
+
+        /* for(let i = 0; i<eventapi.events.length; i++){
+          if(eventapi.events[i].id === eventapi.idOfSelectTime){
+            if(eventapi.events[i].groupId === 'hostSelect'){
+              eventapi.events[i].groupId = 'inviteeSelect';
+              eventapi.events[i].backgroundColor = '#002d70';
+              eventapi.events[i].borderColor = '#002d70';
+            }
+          }
+        } */
       },
 
       // 动态调整日历的格式：实现的时候与表单进行绑定（第三期任务）
@@ -811,13 +870,6 @@ export default {
   margin: 0 auto;
 }
 
-/* .fc-event-main :hover{
-  border: 2px solid #333333;
-} */
-/* .fc-timegrid-event-harness >>> a :active{
-  border-color: #333333;
-} */
-
 .title{
   position: absolute;
   top: 130px;
@@ -845,6 +897,18 @@ export default {
   font-weight: 600;
   font-style: normal;
   font-size: 18px;
+  color: #333333;
+}
+
+.eventDuration {
+  position: absolute;
+  top: 80px;
+  width: 217px;
+  height: 42px;
+  font-family: "Arial Negreta", "Arial Normal", "Arial";
+  font-weight: 600;
+  font-style: normal;
+  font-size: 17px;
   color: #333333;
 }
 
@@ -879,7 +943,7 @@ export default {
   width: 15px;
   height: 15px;
   display: flex;
-  background-color: #FAAD14;
+  background-color: #95de64;
 }
 
 .timeTips2_text {
@@ -900,7 +964,7 @@ export default {
   width: 15px;
   height: 15px;
   display: flex;
-  background-color: #171972;
+  background-color: #002d70;
 }
 
 .timeTips3_text {
@@ -926,9 +990,10 @@ export default {
 }
 
 .left_wrapper{
-    position: absolute;
-    top:220px;
-    left: -60px;
+    position: fixed;
+    top:170px;
+    left: 90px;
+    z-index: 2;
 }
 
 .box-card {
@@ -954,9 +1019,10 @@ export default {
 } */
 
 .left_wrapper2{
-    position: absolute;
-    top:450px;
-    left: -60px;
+    position: fixed;
+    top:390px;
+    left: 90px;
+    z-index: 2;
 }
 
 .box-card2 {
@@ -974,7 +1040,7 @@ export default {
 }
 
 .responseList{
-  height: 280px;
+  height: 250px;
   width: 200px;
 }
 
@@ -1013,9 +1079,10 @@ export default {
 }
 
 .right_wrapper{
-    position: absolute;
+    position: fixed;
     top: 220px;
-    right: -80px;
+    right: 80px;
+    z-index: 2;
 }
 
 .box-card3 {

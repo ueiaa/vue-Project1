@@ -7,9 +7,9 @@
               <div class="code-card-title">注意</div>
               <div class="code-card-content">
                 <div class="code-card-tips">
-                  <span>请保存你的事件密钥</span>
+                  <span>请保存您的密钥</span>
                   <span>没有该密钥</span>
-                  <span>你将无法查看事件的结果</span>
+                  <span>您将无法查看结果</span>
                 </div>
                 <div class="code-card-code">
                   <span>{{ hostCode }}</span>
@@ -18,7 +18,7 @@
                         v-clipboard:success="onCopy"
                         v-clipboard:error="onError">复制</el-button>
                 </div>
-                <div class="code-card-phone">
+                <!-- <div class="code-card-phone">
                   <el-checkbox class="code-card-phone-tips" v-model="codeChecked">将密钥发送至您的手机</el-checkbox>
                   <div class="code-phone-form" v-if="codeChecked">
                       <el-form ref="codePhoneForm" size="medium" label-position="right" :model="codePhoneForm" :rules="rules" label-width="100px">
@@ -28,7 +28,7 @@
                       <el-button class="phone-btn">发送</el-button>
                       </el-form>
                   </div>
-                </div>
+                </div> -->
               </div>
             </el-card>
           </div>
@@ -50,7 +50,7 @@
                 </div>
                 <div class="links-card-contents">
                   <div class="links-card-titles">
-                    <span>查看事件结果链接</span>
+                    <span>查看结果</span>
                   </div>
                   <div class="links-card-links">
                     <span class="url" @click="result()">{{ resultLink }}</span>
@@ -64,7 +64,7 @@
                 </div>
                 <div class="links-card-contents">
                   <div class="links-card-titles">
-                    <span>重新编辑事件链接</span>
+                    <span>重新编辑</span>
                   </div>
                   <div class="links-card-links">
                     <span class="url" @click="edit()">{{ editLink }}</span>
@@ -95,13 +95,13 @@ export default {
     },
     data() {
         return {
-            codeChecked: false,
+            //codeChecked: false,
             eventCode: this.$route.params.eventCode,
             hostCode: this.$route.params.hostCode,
-            shareLink: 'http://localhost:8080/choose/' + this.$route.params.eventCode,
-            resultLink: 'http://localhost:8080/' + this.$route.params.eventCode + '/result/' + this.$route.params.hostCode,
-            editLink: 'http://localhost:8080/' + this.$route.params.eventCode + '/edit/' + this.$route.params.hostCode,
-            codePhoneForm: {
+            shareLink: 'http://zk123.top:8888/#/choose/' + this.$route.params.eventCode,
+            resultLink: 'http://zk123.top:8888/#/' + this.$route.params.eventCode + '/result/' + this.$route.params.hostCode,
+            editLink: 'http://zk123.top:8888/#/' + this.$route.params.eventCode + '/edit/' + this.$route.params.hostCode,
+            /* codePhoneForm: {
                 codePhone: ''
             },
             rules: {
@@ -109,7 +109,7 @@ export default {
                     { required: true, message: '请输入手机号码', trigger: 'blur' },
                     { pattern: /^((1[3,5,8][0-9])|(14[5,7])|(17[0,5,6,7,8])|(19[7]))\d{8}$/, message: '请检查手机号是否正确', trigger: 'blur' },
                 ]
-            }
+            } */
         }
     },
     methods: {

@@ -13,14 +13,14 @@
           </ul>
         </div>
         <div class="btn-wrapper">
-          <el-button @click="itemClick('/create')" round>创建事件</el-button>
+          <el-button @click="itemClick('/create')" round>发起活动</el-button>
           <el-button @click="itemClick('/EnterResults')" round>查看结果</el-button>
         </div>
         <div class="help-wrapper">
           <ul class="help-info">
-            <li>单击选择您有空的时间，您将获得一个链接以发送给共同参与此次事件的其他人</li>
-            <li>他们会看到您选择的时间与其他参与者选择的时间（如果选择被公开）</li>
-            <li>您可以访问结果页面并最终决定该事件的执行时间</li>
+            <li>单击选择您有空的时间，您将获得一个邀请链接，可以将其发送给共同参与此次活动的其他人</li>
+            <li>他们会看到您选择的时间以及其他参与者选择的时间</li>
+            <li>您可以访问结果页面并最终决定该活动的开始时间</li>
           </ul>
           <div class="help-more">
             <span>
@@ -44,12 +44,7 @@ export default {
   methods: {
     itemClick (path) {
       this.$router.push(path);
-    },
-
-    /* resultCheck(){
-
-      this.$router.push({ name: 'result', params: { eventCode: 'ipia2cn',hostCode: 'e7sg8t4' }});
-    } */
+    }
   }
 }
 </script>
@@ -99,11 +94,11 @@ export default {
 .btn-wrapper{
     position: absolute;
     top: 180px;
-    right: 130px;
+    right: 50px;
 }
 
 .btn-wrapper .el-button{
-    margin: 0 10px;
+    margin: 0 20px;
 
     font-size: 25px;
     color: white;
